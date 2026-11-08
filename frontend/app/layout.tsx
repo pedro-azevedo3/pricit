@@ -1,4 +1,4 @@
 import type { Metadata } from 'next';
 import './globals.css';
-export const metadata: Metadata = { title:'pricit · Precifique com confiança', icons: { icon: '/favicon.png', apple: '/favicon.png' }, description:'Ingredientes, receitas e precificações de faturamento para o seu negócio de confeitaria.' };
+export const metadata: Metadata = { metadataBase: new URL('https://pricit.up.railway.app'), title:'pricit · Precifique com confiança', icons: { icon: '/favicon.png', apple: '/favicon.png' }, description:'Ingredientes, receitas e precificações de faturamento para o seu negócio de confeitaria.' };
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){return <html lang="pt-BR" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html: `(function(){try{var t=localStorage.getItem('izyprice-theme');document.documentElement.dataset.theme=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'}catch(e){document.documentElement.dataset.theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}})()`}}/></head><body>{children}</body></html>;}
