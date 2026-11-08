@@ -33,15 +33,23 @@ def keys(tmp_path_factory):
     public.write_bytes(private.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo))
     return private, public
 
+@pytest.mark.parametrize('key_source', ['file', 'environment', 'escaped_environment'])
 @pytest.mark.parametrize('runtime', ['python', 'node'])
-def test_service_output_never_contains_plaintext_and_is_recoverable(runtime, keys):
+def test_service_output_never_contains_plaintext_and_is_recoverable(runtime, keys, key_source):
     private, public = keys
     payload = 'cliente@example.test receita confidencial ' * 400
     if runtime == 'python':
         command = [sys.executable, str(ROOT/'backend/scripts/encrypted_run.py'), sys.executable, '-c', f'import sys;sys.stdout.write({payload!r});sys.stderr.write("token-secreto");sys.exit(7)']
     else:
         command = ['node', str(ROOT/'frontend/scripts/encrypted-run.mjs'), 'node', '-e', f'process.stdout.write({json.dumps(payload)});process.stderr.write("token-secreto");process.exitCode=7;']
-    result = subprocess.run(command, env={**os.environ, 'LOG_PUBLIC_KEY_FILE': str(public)}, capture_output=True)
+    env = {**os.environ, 'LOG_PUBLIC_KEY_FILE': str(public)}
+    env.pop('LOG_PUBLIC_KEY_PEM', None)
+    if key_source != 'file':
+        env['LOG_PUBLIC_KEY_FILE'] = '/missing/key.pem'
+        env['LOG_PUBLIC_KEY_PEM'] = public.read_text()
+        if key_source == 'escaped_environment':
+            env['LOG_PUBLIC_KEY_PEM'] = env['LOG_PUBLIC_KEY_PEM'].replace('\n', '\\n')
+    result = subprocess.run(command, env=env, capture_output=True)
     assert result.returncode == 7
     assert result.stderr == b''
     assert b'cliente@' not in result.stdout and b'token-secreto' not in result.stdout
@@ -101,3 +109,28 @@ def test_backup_integrity_truncation_and_restore(keys, tmp_path):
         with pytest.raises(Exception):
             backup.restore(source,dest,private)
         assert not dest.exists()
+
+
+def test_data_keys_from_environment(monkeypatch):
+    monkeypatch.setenv('DATA_KEYS_FILE', '/missing/data.json')
+    monkeypatch.setenv('DATA_KEYS_JSON', json.dumps({'active': 'railway', 'keys': {'railway': base64.b64encode(os.urandom(32)).decode()}}))
+    keyring.cache_clear()
+    try:
+        token = seal('Receita', 'test.name', 'name')
+        assert unseal(token, 'test.name', 'name') == 'Receita'
+        monkeypatch.setenv('DATA_KEYS_JSON', 'invalid')
+        keyring.cache_clear()
+        with pytest.raises(RuntimeError, match='keys unavailable'):
+            keyring()
+    finally:
+        keyring.cache_clear()
+
+
+@pytest.mark.parametrize('runtime', ['python', 'node'])
+def test_invalid_environment_log_key_does_not_fall_back(runtime, keys):
+    _, public = keys
+    executable = sys.executable if runtime == 'python' else 'node'
+    wrapper = ROOT / ('backend/scripts/encrypted_run.py' if runtime == 'python' else 'frontend/scripts/encrypted-run.mjs')
+    result = subprocess.run([executable, str(wrapper), executable, '-c' if runtime == 'python' else '-e', 'print("SENSITIVE")' if runtime == 'python' else 'console.log("SENSITIVE")'], env={**os.environ, 'LOG_PUBLIC_KEY_FILE': str(public), 'LOG_PUBLIC_KEY_PEM': 'invalid'}, capture_output=True)
+    assert result.returncode == 78
+    assert b'SENSITIVE' not in result.stdout + result.stderr

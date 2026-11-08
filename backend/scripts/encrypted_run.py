@@ -15,7 +15,9 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 def load_key(path):
-    key = serialization.load_pem_public_key(Path(path).read_bytes())
+    encoded = os.environ.get('LOG_PUBLIC_KEY_PEM')
+    contents = encoded.replace('\\n', '\n').encode() if encoded is not None else Path(path).read_bytes()
+    key = serialization.load_pem_public_key(contents)
     if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 3072:
         raise ValueError('Invalid log encryption key')
     der = key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)

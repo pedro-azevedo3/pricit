@@ -26,7 +26,10 @@ FIELDS = {
 @lru_cache(maxsize=1)
 def keyring():
     try:
-        data = json.loads(Path(os.environ.get('DATA_KEYS_FILE', '/run/secrets/data_keys')).read_text())
+        contents = os.environ.get('DATA_KEYS_JSON')
+        if contents is None:
+            contents = Path(os.environ.get('DATA_KEYS_FILE', '/run/secrets/data_keys')).read_text()
+        data = json.loads(contents)
         active = data['active']
         keys = {kid: base64.b64decode(value, validate=True) for kid, value in data['keys'].items()}
         if active not in keys or any(not re.fullmatch(r'[a-zA-Z0-9_-]{1,40}', k) or len(v) != 32 for k,v in keys.items()):

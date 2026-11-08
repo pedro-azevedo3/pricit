@@ -189,3 +189,7 @@ Os testes de domínio do backend usam uma dependência autenticada de teste; `te
 ## Privacidade e integração Google
 
 Consulte [proteção de logs, banco e backups](docs/PRIVACIDADE.md) para chaves, backup, restauração e limites. Consulte [integração Google](docs/GOOGLE_LOGIN.md) para configurar o projeto no Google Cloud e conhecer as etapas restantes de autenticação e autorização.
+
+## Deploy no Railway
+
+Consulte [o passo a passo do Railway](docs/RAILWAY.md) para configurar os três serviços, as variáveis, as chaves e o primeiro usuário.

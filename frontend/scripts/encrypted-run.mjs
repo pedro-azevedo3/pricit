@@ -6,7 +6,9 @@ import { once } from 'node:events';
 let publicKey;
 let kid;
 try {
-  publicKey = createPublicKey(readFileSync(process.env.LOG_PUBLIC_KEY_FILE || '/run/secrets/log_public_key'));
+  publicKey = createPublicKey(process.env.LOG_PUBLIC_KEY_PEM !== undefined
+    ? process.env.LOG_PUBLIC_KEY_PEM.replace(/\\n/g, '\n')
+    : readFileSync(process.env.LOG_PUBLIC_KEY_FILE || '/run/secrets/log_public_key'));
   if (publicKey.asymmetricKeyType !== 'rsa' || publicKey.asymmetricKeyDetails.modulusLength < 3072) throw new Error();
   kid = createHash('sha256').update(publicKey.export({ type: 'spki', format: 'der' })).digest('hex').slice(0, 16);
 } catch {
