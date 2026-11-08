@@ -7,6 +7,8 @@ test('ingredientes, receita, precificação, histórico, PDF e persistência',as
  const nav=page.getByRole('navigation',{name:testInfo.project.name==='mobile'?'Navegação móvel':'Navegação principal'});
  await page.getByRole('button',{name:'Novo ingrediente',exact:true}).first().click();
  await expect(page.getByLabel('Unidade de medida')).toHaveValue('g');
+ await expect(page.getByLabel('Quantidade da embalagem')).toHaveValue('');
+ await page.getByLabel('Quantidade da embalagem').fill('1000');
  await page.getByLabel('Nome do ingrediente').fill(ingredientName);
  await page.getByLabel('Valor pago pela embalagem').fill('40');
  await expect(page.getByRole('dialog')).toContainText('R$ 0,04');
@@ -16,8 +18,10 @@ test('ingredientes, receita, precificação, histórico, PDF e persistência',as
  await expect(page.getByRole('row').filter({hasText:ingredientName})).toContainText('R$ 40,00');
  await nav.getByRole('button',{name:'Receitas'}).click();
  await page.getByRole('button',{name:'Nova receita',exact:true}).click();
+ await expect(page.getByLabel('Rendimento (unidades)')).toHaveValue('');
+ await page.getByLabel('Rendimento (unidades)').fill('12');
  await page.getByLabel('Nome da receita').fill(recipeName);
- await page.getByLabel('Selecionar ingrediente').selectOption({label:ingredientName});
+ await page.getByLabel('Selecionar ingrediente').selectOption((await page.getByLabel('Selecionar ingrediente').locator('option').filter({hasText:ingredientName}).getAttribute('value'))!);
  await expect(page.getByLabel(`Quantidade de ${ingredientName}`,{exact:true})).toHaveCount(0);
  await expect(page.getByRole('button',{name:'Adicionar ingrediente',exact:true})).toBeDisabled();
  await expect(page.getByRole('combobox',{name:'Unidade usada',exact:true})).toHaveValue('g');

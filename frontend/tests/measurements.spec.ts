@@ -33,7 +33,7 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
       const dialog=page.getByRole('dialog');
       await dialog.getByLabel('Nome do ingrediente').fill(name);
       await dialog.getByLabel('Unidade de medida').selectOption(unit);
-      if(unit==='un') await expect(dialog.getByLabel('Quantidade da embalagem')).toHaveValue('1.00');
+      await expect(dialog.getByLabel('Quantidade da embalagem')).toHaveValue('');
       await dialog.getByLabel('Quantidade da embalagem').fill(quantity);
       await dialog.getByLabel('Valor pago pela embalagem').fill(price);
       await expect(dialog).toContainText(unit==='un'?'Custo por unidade':'Custo por mililitro');
@@ -49,7 +49,7 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
     await page.getByLabel('Nome da receita').fill(names.recipe);
     await page.getByLabel('Rendimento (unidades)').fill('4');
     for(const [name,unit,quantity] of [[names.eggs,'un','2'],[names.milk,'ml','250']]){
-      await page.getByLabel('Selecionar ingrediente').selectOption({label:name});
+      await page.getByLabel('Selecionar ingrediente').selectOption(ids[name===names.eggs?0:1]);
       const select=page.getByRole('combobox',{name:'Unidade usada',exact:true});
       await expect(select).toHaveValue(unit);
       await expect(select.locator('option')).toHaveCount(1);
@@ -70,6 +70,7 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
     await page.getByRole('button',{name:`Editar ingrediente ${names.eggs}`,exact:true}).click();
     const editor=page.getByRole('dialog',{name:'Editar ingrediente',exact:true});
     await expect(editor.getByLabel('Unidade de medida')).toHaveValue('un');
+    await expect(editor.getByLabel('Quantidade da embalagem')).toHaveValue('12.00');
     await editor.getByLabel('Valor pago pela embalagem').fill('24');
     await editor.getByRole('button',{name:'Salvar ingrediente',exact:true}).click();
     await expect(editor).toHaveCount(0);
@@ -78,6 +79,54 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
     expect(Number(updated.pricing.ingredients_cost)).toBe(6);
   } finally {
     if(recipeId) await request.delete('/api/v1/recipes/'+recipeId);
+    for(const id of ids) await request.delete('/api/v1/ingredients/'+id);
+  }
+});
+
+
+test('campos novos começam vazios e a seleção compara preço e embalagem entre marcas',async({page,request},testInfo)=>{
+  const suffix=`${testInfo.project.name}-${Date.now()}`;
+  const ids:string[]=[];
+  try {
+    await page.goto('/app');
+    await page.getByRole('button',{name:'Novo ingrediente',exact:true}).first().click();
+    const ingredientDialog=page.getByRole('dialog');
+    await expect(ingredientDialog.getByLabel('Quantidade da embalagem')).toHaveValue('');
+    await expect(ingredientDialog.getByLabel('Quantidade da embalagem')).toHaveAttribute('placeholder','Ex.: 1000');
+    await ingredientDialog.getByLabel('Unidade de medida').selectOption('un');
+    await expect(ingredientDialog.getByLabel('Quantidade da embalagem')).toHaveValue('');
+    await expect(ingredientDialog.getByLabel('Quantidade da embalagem')).toHaveAttribute('placeholder','Ex.: 12');
+    await ingredientDialog.getByRole('button',{name:'Cancelar',exact:true}).click();
+    for(const [brand,quantity,price] of [['A','1000','6'],['B','500','10']]){
+      const response=await request.post('/api/v1/ingredients',{data:{name:`Farinha marca ${brand} ${suffix}`,measurement_unit:'g',package_quantity:quantity,package_price:price}});
+      expect(response.status()).toBe(201);
+      ids.push((await response.json()).id);
+    }
+    const nav=page.getByRole('navigation',{name:testInfo.project.name==='mobile'?'Navegação móvel':'Navegação principal'});
+    await nav.getByRole('button',{name:'Receitas'}).click();
+    await page.getByRole('button',{name:'Nova receita',exact:true}).click();
+    const recipeDialog=page.getByRole('dialog');
+    const yieldField=recipeDialog.getByLabel('Rendimento (unidades)');
+    await expect(yieldField).toHaveValue('');
+    await expect(yieldField).toHaveAttribute('placeholder','Ex.: 12');
+    await expect(page.getByTestId('unit-cost')).toHaveText('—');
+    expect(await yieldField.evaluate((el:HTMLInputElement)=>el.validity.valueMissing)).toBe(true);
+    const select=recipeDialog.getByLabel('Selecionar ingrediente');
+    await expect(select.locator(`option[value="${ids[0]}"]`)).toContainText('R$ 6,00 / 1.000,00 g');
+    await expect(select.locator(`option[value="${ids[1]}"]`)).toContainText('R$ 10,00 / 500,00 g');
+    await yieldField.fill('10');
+    await expect(recipeDialog.getByLabel('Quantidade de embalagens')).toHaveValue('10');
+    for(const id of ids){
+      await select.selectOption(id);
+      await recipeDialog.getByLabel('Quantidade usada',{exact:true}).fill('100');
+      await recipeDialog.getByRole('button',{name:'Adicionar ingrediente',exact:true}).click();
+    }
+    await expect(recipeDialog).toContainText('1.000,00 g por R$ 6,00');
+    await expect(recipeDialog).toContainText('500,00 g por R$ 10,00');
+    await expect(page.getByTestId('unit-cost')).toHaveText('R$ 0,26');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+    await recipeDialog.getByRole('button',{name:'Cancelar',exact:true}).click();
+  } finally {
     for(const id of ids) await request.delete('/api/v1/ingredients/'+id);
   }
 });

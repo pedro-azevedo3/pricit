@@ -20,6 +20,7 @@ test('arredondamento uniforme e duas casas sem alterar cálculos', () => {
 test('campos e prévias usam o mesmo padrão', async ({page}) => {
   await page.goto('/app');
   await page.getByRole('button',{name:'Novo ingrediente',exact:true}).first().click();
+  await page.getByLabel('Quantidade da embalagem').fill('1000');
   const price = page.getByLabel('Valor pago pela embalagem');
   await price.fill('5.27');
   await page.getByLabel('Nome do ingrediente').click();

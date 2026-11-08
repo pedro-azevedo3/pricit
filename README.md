@@ -149,7 +149,7 @@ Os registros temporários usados na validação inicial foram removidos; a aplic
 
 ## Edição de ingredientes dentro da receita
 
-Novos ingredientes usam gramas (`g`) por padrão, com embalagem inicial de 1.000 g. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade compatível com o cadastro (g/kg, ml ou un) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
+Novos ingredientes usam gramas (`g`) por padrão. Quantidade da embalagem e rendimento da receita começam vazios, com exemplos apenas no placeholder; ao editar, os valores salvos continuam preenchidos. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade compatível com o cadastro (g/kg, ml ou un) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. As opções mostram nome, preço e quantidade da embalagem para comparar marcas diferentes. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
 
 A área anteriormente chamada Simulador agora aparece como **Precificação**, inclusive nos botões, históricos e PDFs. Os endpoints `/simulations` continuam compatíveis.
 
