@@ -5,16 +5,29 @@ import { once } from 'node:events';
 
 let publicKey;
 let kid;
-try {
-  publicKey = createPublicKey(process.env.LOG_PUBLIC_KEY_PEM !== undefined
-    ? process.env.LOG_PUBLIC_KEY_PEM.replace(/\\n/g, '\n')
-    : readFileSync(process.env.LOG_PUBLIC_KEY_FILE || '/run/secrets/log_public_key'));
-  if (publicKey.asymmetricKeyType !== 'rsa' || publicKey.asymmetricKeyDetails.modulusLength < 3072) throw new Error();
-  kid = createHash('sha256').update(publicKey.export({ type: 'spki', format: 'der' })).digest('hex').slice(0, 16);
-} catch {
-  process.stderr.write('Log encryption unavailable; service not started.\n');
+function configurationError(reason) {
+  process.stderr.write(`Log encryption configuration v2: ${reason}; service not started.\n`);
   process.exit(78);
 }
+let contents;
+if (process.env.LOG_PUBLIC_KEY_PEM !== undefined) {
+  contents = process.env.LOG_PUBLIC_KEY_PEM.replace(/\\n/g, '\n').trim();
+  if (!contents) configurationError('LOG_PUBLIC_KEY_PEM is empty');
+} else {
+  try {
+    contents = readFileSync(process.env.LOG_PUBLIC_KEY_FILE || '/run/secrets/log_public_key');
+  } catch {
+    configurationError('LOG_PUBLIC_KEY_PEM is not set and key file is unavailable');
+  }
+}
+try {
+  publicKey = createPublicKey(contents);
+} catch {
+  configurationError('public key is not valid PEM; paste the complete public PEM including BEGIN and END lines');
+}
+if (publicKey.asymmetricKeyType !== 'rsa') configurationError('public key must be RSA');
+if (publicKey.asymmetricKeyDetails.modulusLength < 3072) configurationError('RSA public key must have at least 3072 bits');
+kid = createHash('sha256').update(publicKey.export({ type: 'spki', format: 'der' })).digest('hex').slice(0, 16);
 const command = process.argv.slice(2);
 if (!command.length) process.exit(64);
 const child = spawn(command[0], command.slice(1), { stdio: ['ignore', 'pipe', 'pipe'], detached: true });

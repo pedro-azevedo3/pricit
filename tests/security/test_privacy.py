@@ -67,6 +67,7 @@ def test_missing_log_key_never_starts_service(runtime, tmp_path):
     result = subprocess.run([executable, str(wrapper), executable, '-c' if runtime == 'python' else '-e', 'print("SENSITIVE")' if runtime=='python' else 'console.log("SENSITIVE")'], env={**os.environ, 'LOG_PUBLIC_KEY_FILE': str(tmp_path/'missing')}, capture_output=True)
     assert result.returncode == 78
     assert b'SENSITIVE' not in result.stdout + result.stderr
+    assert b'LOG_PUBLIC_KEY_PEM is not set' in result.stderr
 
 
 def test_field_encryption_precision_unicode_and_tamper_detection(tmp_path, monkeypatch):
@@ -133,4 +134,17 @@ def test_invalid_environment_log_key_does_not_fall_back(runtime, keys):
     wrapper = ROOT / ('backend/scripts/encrypted_run.py' if runtime == 'python' else 'frontend/scripts/encrypted-run.mjs')
     result = subprocess.run([executable, str(wrapper), executable, '-c' if runtime == 'python' else '-e', 'print("SENSITIVE")' if runtime == 'python' else 'console.log("SENSITIVE")'], env={**os.environ, 'LOG_PUBLIC_KEY_FILE': str(public), 'LOG_PUBLIC_KEY_PEM': 'invalid'}, capture_output=True)
     assert result.returncode == 78
+    assert b'SENSITIVE' not in result.stdout + result.stderr
+
+
+@pytest.mark.parametrize('runtime', ['python', 'node'])
+@pytest.mark.parametrize('value,diagnostic', [('', 'LOG_PUBLIC_KEY_PEM is empty'), ('not-a-key-private-sentinel', 'public key is not valid PEM')])
+def test_log_key_diagnostic_is_safe(runtime, value, diagnostic):
+    executable = sys.executable if runtime == 'python' else 'node'
+    wrapper = ROOT / ('backend/scripts/encrypted_run.py' if runtime == 'python' else 'frontend/scripts/encrypted-run.mjs')
+    result = subprocess.run([executable, str(wrapper), executable, '-c' if runtime == 'python' else '-e', 'print("SENSITIVE")' if runtime == 'python' else 'console.log("SENSITIVE")'], env={**os.environ, 'LOG_PUBLIC_KEY_PEM': value}, capture_output=True)
+    assert result.returncode == 78
+    assert diagnostic.encode() in result.stderr
+    assert b'configuration v2' in result.stderr
+    assert b'not-a-key-private-sentinel' not in result.stderr
     assert b'SENSITIVE' not in result.stdout + result.stderr

@@ -14,12 +14,29 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
+class LogKeyConfigurationError(ValueError):
+    """Safe diagnostic containing no key material or underlying exception text."""
+
+
 def load_key(path):
     encoded = os.environ.get('LOG_PUBLIC_KEY_PEM')
-    contents = encoded.replace('\\n', '\n').encode() if encoded is not None else Path(path).read_bytes()
-    key = serialization.load_pem_public_key(contents)
-    if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 3072:
-        raise ValueError('Invalid log encryption key')
+    if encoded is not None:
+        if not encoded.strip():
+            raise LogKeyConfigurationError('LOG_PUBLIC_KEY_PEM is empty')
+        contents = encoded.replace('\\n', '\n').strip().encode()
+    else:
+        try:
+            contents = Path(path).read_bytes()
+        except OSError:
+            raise LogKeyConfigurationError('LOG_PUBLIC_KEY_PEM is not set and key file is unavailable') from None
+    try:
+        key = serialization.load_pem_public_key(contents)
+    except (ValueError, TypeError):
+        raise LogKeyConfigurationError('public key is not valid PEM; paste the complete public PEM including BEGIN and END lines') from None
+    if not isinstance(key, rsa.RSAPublicKey):
+        raise LogKeyConfigurationError('public key must be RSA')
+    if key.key_size < 3072:
+        raise LogKeyConfigurationError('RSA public key must have at least 3072 bits')
     der = key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
     return key, hashlib.sha256(der).hexdigest()[:16]
 
@@ -39,8 +56,11 @@ def main():
     # Fail closed: never start the application with unprotected log output.
     try:
         key, kid = load_key(os.environ.get('LOG_PUBLIC_KEY_FILE', '/run/secrets/log_public_key'))
+    except LogKeyConfigurationError as error:
+        sys.stderr.write(f'Log encryption configuration v2: {error}; service not started.\n')
+        return 78
     except Exception:
-        sys.stderr.write('Log encryption unavailable; service not started.\n')
+        sys.stderr.write('Log encryption configuration v2: unable to initialize; service not started.\n')
         return 78
     if len(sys.argv) < 2:
         return 64
