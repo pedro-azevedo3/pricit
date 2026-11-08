@@ -149,7 +149,7 @@ Os registros temporários usados na validação inicial foram removidos; a aplic
 
 ## Edição de ingredientes dentro da receita
 
-Novos ingredientes usam gramas (`g`) por padrão. Quantidade da embalagem e rendimento da receita começam vazios, com exemplos apenas no placeholder; ao editar, os valores salvos continuam preenchidos. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade compatível com o cadastro (g/kg, ml ou un) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. As opções mostram nome, preço e quantidade da embalagem para comparar marcas diferentes. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
+Novos ingredientes usam gramas (`g`) por padrão. Quantidade da embalagem, rendimento da receita e campos de horas/minutos começam vazios, com exemplos apenas no placeholder; ao editar, os valores salvos continuam preenchidos. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade compatível com o cadastro (g/kg, ml ou un) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. As opções mostram nome, preço e quantidade da embalagem para comparar marcas diferentes. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
 
 A área anteriormente chamada Simulador agora aparece como **Precificação**, inclusive nos botões, históricos e PDFs. Os endpoints `/simulations` continuam compatíveis.
 
@@ -201,7 +201,7 @@ Consulte [o passo a passo do Railway](docs/RAILWAY.md) para configurar os três 
 
 ## Ingredientes por massa, volume e unidade
 
-- `g` e `kg` pertencem à mesma medida: 1 kg = 1.000 g. O sistema calcula custo por grama e quilograma.
+- `g` e `kg` pertencem à mesma medida: 1 kg = 1.000 g. O sistema calcula custo por grama e quilograma. Na tabela da biblioteca, ingredientes cadastrados em `g` apresentam o custo a cada 100 g, calculado antes do arredondamento de exibição. Essa apresentação não altera os cálculos das receitas nem as outras medidas.
 - `ml` calcula custo por mililitro, sem conversão automática para gramas.
 - `un` calcula custo por unidade. Exemplo: 12 ovos por R$ 18,00 custam R$ 1,50 cada; usar 2 ovos custa R$ 3,00. Quantidades fracionadas são permitidas, como meio ovo.
 - Uma receita pode combinar todas essas medidas. O seletor oferece apenas unidades compatíveis com cada ingrediente, e a API recusa combinações incompatíveis.

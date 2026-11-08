@@ -20,6 +20,8 @@ test('ingredientes, receita, precificação, histórico, PDF e persistência',as
  await page.getByRole('button',{name:'Nova receita',exact:true}).click();
  await expect(page.getByLabel('Rendimento (unidades)')).toHaveValue('');
  await page.getByLabel('Rendimento (unidades)').fill('12');
+ await page.getByLabel('Horas',{exact:true}).fill('1');
+ await page.getByLabel('Minutos',{exact:true}).fill('30');
  await page.getByLabel('Nome da receita').fill(recipeName);
  await page.getByLabel('Selecionar ingrediente').selectOption((await page.getByLabel('Selecionar ingrediente').locator('option').filter({hasText:ingredientName}).getAttribute('value'))!);
  await expect(page.getByLabel(`Quantidade de ${ingredientName}`,{exact:true})).toHaveCount(0);

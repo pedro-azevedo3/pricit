@@ -48,6 +48,18 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
     await page.getByRole('button',{name:'Nova receita',exact:true}).click();
     await page.getByLabel('Nome da receita').fill(names.recipe);
     await page.getByLabel('Rendimento (unidades)').fill('4');
+    const hours=page.getByLabel('Horas',{exact:true}), minutes=page.getByLabel('Minutos',{exact:true});
+    await expect(hours).toHaveValue('');
+    await expect(hours).toHaveAttribute('placeholder','Ex.: 1');
+    await expect(minutes).toHaveValue('');
+    await expect(minutes).toHaveAttribute('placeholder','Ex.: 30');
+    await hours.click();
+    await page.keyboard.insertText('2');
+    await expect(hours).toHaveValue('2');
+    await hours.fill('');
+    await expect(hours).toHaveValue('');
+    await hours.fill('2');
+    await minutes.fill('15');
     for(const [name,unit,quantity] of [[names.eggs,'un','2'],[names.milk,'ml','250']]){
       await page.getByLabel('Selecionar ingrediente').selectOption(ids[name===names.eggs?0:1]);
       const select=page.getByRole('combobox',{name:'Unidade usada',exact:true});
@@ -64,9 +76,12 @@ test('ingredientes por ml e unidade funcionam no cadastro e na receita',async({p
     const saved=recipes.find((r:{name:string})=>r.name===names.recipe);
     recipeId=saved.id;
     expect(Number(saved.pricing.ingredients_cost)).toBe(5);
+    expect(saved.production_time_minutes).toBe(135);
     await page.reload();
     await nav.getByRole('button',{name:'Receitas'}).click();
     await page.locator('article').filter({hasText:names.recipe}).getByRole('button',{name:'Ver e editar receita'}).click();
+    await expect(page.getByLabel('Horas',{exact:true})).toHaveValue('2');
+    await expect(page.getByLabel('Minutos',{exact:true})).toHaveValue('15');
     await page.getByRole('button',{name:`Editar ingrediente ${names.eggs}`,exact:true}).click();
     const editor=page.getByRole('dialog',{name:'Editar ingrediente',exact:true});
     await expect(editor.getByLabel('Unidade de medida')).toHaveValue('un');
@@ -126,6 +141,34 @@ test('campos novos começam vazios e a seleção compara preço e embalagem entr
     await expect(page.getByTestId('unit-cost')).toHaveText('R$ 0,26');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
     await recipeDialog.getByRole('button',{name:'Cancelar',exact:true}).click();
+  } finally {
+    for(const id of ids) await request.delete('/api/v1/ingredients/'+id);
+  }
+});
+
+
+test('tabela exibe custo por 100 g somente para ingredientes cadastrados em gramas',async({page,request},testInfo)=>{
+  const suffix=`${testInfo.project.name}-${Date.now()}`;
+  const ids:string[]=[];
+  try {
+    const cases=[
+      {unit:'g',quantity:'1000',price:'6',base:0.006,display:'R$ 0,60 / 100 g'},
+      {unit:'kg',quantity:'1',price:'20',base:0.02,display:'R$ 0,02 / g'},
+      {unit:'ml',quantity:'1000',price:'8',base:0.008,display:'R$ 0,01 / ml'},
+      {unit:'un',quantity:'12',price:'18',base:1.5,display:'R$ 1,50 / un'},
+    ];
+    for(const item of cases){
+      const response=await request.post('/api/v1/ingredients',{data:{name:`Medida ${item.unit} ${suffix}`,measurement_unit:item.unit,package_quantity:item.quantity,package_price:item.price}});
+      expect(response.status()).toBe(201);
+      const data=await response.json();ids.push(data.id);
+      expect(Number(data.cost_per_base_unit)).toBe(item.base);
+    }
+    await page.goto('/app');
+    for(const item of cases){
+      const row=page.getByRole('row').filter({hasText:`Medida ${item.unit} ${suffix}`});
+      await expect(row.getByRole('cell').nth(3)).toContainText(item.display);
+      if(item.unit!=='g') await expect(row).not.toContainText('/ 100 g');
+    }
   } finally {
     for(const id of ids) await request.delete('/api/v1/ingredients/'+id);
   }
