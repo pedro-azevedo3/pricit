@@ -55,7 +55,12 @@ def test_service_output_never_contains_plaintext_and_is_recoverable(runtime, key
     assert b'cliente@' not in result.stdout and b'token-secreto' not in result.stdout
     decoded = {'stdout': b'', 'stderr': b''}
     for line in result.stdout.splitlines():
-        record = json.loads(line)
+        # Railway exports only the structured message with a timestamp prefix.
+        structured = json.loads(line)
+        exported = '2026-11-08T02:27:48Z [inf]  ' + structured['message']
+        record = logs.parse_record(exported)
+        assert record == logs.parse_record(line)
+        assert record == logs.parse_record(json.dumps(record))  # Legacy format.
         decoded[record['stream']] += logs.decrypt(record, private)
     assert decoded['stdout'] == payload.encode()
     assert decoded['stderr'] == b'token-secreto'
@@ -148,3 +153,23 @@ def test_log_key_diagnostic_is_safe(runtime, value, diagnostic):
     assert b'configuration v2' in result.stderr
     assert b'not-a-key-private-sentinel' not in result.stderr
     assert b'SENSITIVE' not in result.stdout + result.stderr
+
+
+@pytest.mark.parametrize('runtime', ['python', 'node'])
+def test_railway_export_decrypt_cli(runtime, keys, tmp_path):
+    private, public = keys
+    executable = sys.executable if runtime == 'python' else 'node'
+    wrapper = ROOT / ('backend/scripts/encrypted_run.py' if runtime == 'python' else 'frontend/scripts/encrypted-run.mjs')
+    command = 'import sys;sys.stderr.write("migration failed\\n")' if runtime == 'python' else 'process.stderr.write("migration failed\\n")'
+    encrypted = subprocess.run([executable, str(wrapper), executable, '-c' if runtime == 'python' else '-e', command], env={**os.environ, 'LOG_PUBLIC_KEY_PEM': public.read_text()}, capture_output=True, check=True)
+    exported = '2026-11-08T02:27:47Z [inf]  Starting Container\n'
+    exported += ''.join('2026-11-08T02:27:48Z [inf]  ' + json.loads(line)['message'] + '\n' for line in encrypted.stdout.splitlines())
+    path = tmp_path / 'private.pem'
+    path.write_bytes(private.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+    decrypted = subprocess.run([sys.executable, str(ROOT/'scripts/decrypt-logs.py'), '--private-key', str(path)], input=exported.encode(), capture_output=True)
+    assert decrypted.returncode == 0
+    assert decrypted.stdout == b'migration failed\n'
+    assert decrypted.stderr == b''
+    empty = subprocess.run([sys.executable, str(ROOT/'scripts/decrypt-logs.py'), '--private-key', str(path)], input=b'2026-11-08T02:27:47Z [inf] Starting Container\n', capture_output=True)
+    assert empty.returncode == 1
+    assert b'No encrypted records found' in empty.stderr

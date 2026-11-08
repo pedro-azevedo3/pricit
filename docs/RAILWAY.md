@@ -89,7 +89,7 @@ Informe e confirme uma senha de ao menos 12 caracteres; entre em `https://DOMINI
 ## Diagnóstico
 
 - `Log encryption unavailable; service not started.`: `LOG_PUBLIC_KEY_PEM` ausente/inválida. Use a chave pública RSA de 3072 bits gerada pelo script.
-- Logs JSON com `alg`, `kid` e `data` são esperados: o conteúdo está criptografado. Exporte-os e utilize `scripts/decrypt-logs.py` com a chave privada local, conforme `PRIVACIDADE.md`.
+- Mensagens `PRICIT_ENCRYPTED_LOG` são esperadas: o conteúdo está criptografado e fica no campo `message` para preservar os dados na exportação do Railway. Baixe os logs do deploy e utilize `backend/.venv/bin/python scripts/decrypt-logs.py --private-key .secrets/log-private.pem < /caminho/logs.log` no computador local. O decifrador aceita o prefixo de data do Railway e os envelopes antigos. Exportações antigas com linhas vazias não contêm os dados e exigem um novo deploy e uma nova exportação.
 - Banco sem tabelas: o backend ainda não concluiu a inicialização/migração. Confira conexão, chave de dados e logs; não crie tabelas manualmente.
 - API indisponível: confira `API_URL`, nome do serviço, porta 8000 e faça rebuild do frontend.
 - HTTP 403 no login: confira `CORS_ORIGINS` com a origem HTTPS exata usada no navegador.

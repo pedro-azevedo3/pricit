@@ -42,8 +42,9 @@ function encrypt(chunk, stream) {
   const data = Buffer.concat([cipher.update(chunk), cipher.final(), cipher.getAuthTag()]);
   const key = publicEncrypt({ key: publicKey, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256' }, secret);
   secret.fill(0);
-  return JSON.stringify({ v: 1, alg: 'RSA-OAEP-256+A256GCM', kid, service: 'frontend', stream,
-    key: key.toString('base64'), nonce: nonce.toString('base64'), data: data.toString('base64') }) + '\n';
+  const envelope = JSON.stringify({ v: 1, alg: 'RSA-OAEP-256+A256GCM', kid, service: 'frontend', stream,
+    key: key.toString('base64'), nonce: nonce.toString('base64'), data: data.toString('base64') });
+  return JSON.stringify({message: 'PRICIT_ENCRYPTED_LOG ' + envelope, level: stream === 'stderr' ? 'error' : 'info'}) + '\n';
 }
 async function pump(source, stream) {
   for await (const bytes of source) {

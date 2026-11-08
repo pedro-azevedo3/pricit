@@ -48,8 +48,9 @@ def encrypt_chunk(key, kid, service, stream, data):
     sealed = AESGCM(secret).encrypt(nonce, data, aad)
     wrapped = key.encrypt(secret, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None))
     b64 = lambda value: base64.b64encode(value).decode('ascii')
-    return json.dumps(dict(v=1, alg='RSA-OAEP-256+A256GCM', kid=kid, service=service, stream=stream,
-                           key=b64(wrapped), nonce=b64(nonce), data=b64(sealed)), separators=(',', ':'))
+    envelope = json.dumps(dict(v=1, alg='RSA-OAEP-256+A256GCM', kid=kid, service=service, stream=stream,
+                               key=b64(wrapped), nonce=b64(nonce), data=b64(sealed)), separators=(',', ':'))
+    return envelope
 
 
 def main():
@@ -84,7 +85,11 @@ def main():
                     selector.unregister(item.fileobj)
                     item.fileobj.close()
                     continue
-                sys.stdout.write(encrypt_chunk(key, kid, service, item.data, chunk) + '\n')
+                # Railway exports retain message, but discard arbitrary structured fields.
+                envelope = encrypt_chunk(key, kid, service, item.data, chunk)
+                message = {'message': 'PRICIT_ENCRYPTED_LOG ' + envelope,
+                           'level': 'error' if item.data == 'stderr' else 'info'}
+                sys.stdout.write(json.dumps(message, separators=(',', ':')) + '\n')
                 sys.stdout.flush()
     except Exception:
         # Do not print exception text or fall back to plaintext on encryption/output failure.
