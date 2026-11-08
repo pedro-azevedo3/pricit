@@ -190,7 +190,6 @@
 @media (hover: hover) {
   .primary:hover svg, .headerCta:hover svg, .darkButton:hover svg, .calcCta:hover svg { transform: translate(3px, -3px); }
   .steps article:hover .stepTop > svg { transform: translateY(-4px) rotate(-6deg); }
-  .finalCta:hover > img { transform: rotate(3deg) translateY(-5px); }
 }
 @keyframes headerEnter { from { opacity: 0; translate: 0 -8px; } to { opacity: 1; translate: 0 0; } }
 @keyframes mascotFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
@@ -202,4 +201,34 @@
   .landing *, .landing *::before, .landing *::after { animation: none !important; transition: none !important; }
   .steps article:hover .stepTop > svg, .primary:hover svg, .headerCta:hover svg, .darkButton:hover svg, .calcCta:hover svg { transform: none; }
   .finalCta:hover > img { transform: rotate(8deg); }
+}
+
+/* Hover transforms stay separate from the scroll reveal's translate/rotate/scale. */
+.plan { transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease; }
+.planPrice { transition: color 280ms ease; }
+.comingSoon { transition: background-color 280ms ease; }
+.recipePreview { transition: transform 400ms cubic-bezier(.2,.65,.3,1), box-shadow 400ms ease; }
+.recipeIcon, .pdfBadge, .organizeCopy li, .organizeCopy li svg { transition: transform 300ms ease, background-color 300ms ease; }
+.organizeCopy li:nth-child(2) { transition-delay: 35ms; }
+.organizeCopy li:nth-child(3) { transition-delay: 70ms; }
+.interactiveMascot { --mascot-angle: 0deg; transform-origin: 50% 85%; transition: transform 300ms ease; }
+.heroMascot, .finalCta > img { --mascot-angle: 8deg; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .plan:hover { transform: translateY(-9px); border-color: #9bb77e; box-shadow: 0 18px 38px #173d3014; }
+  .annualPlan:hover { box-shadow: 0 18px 38px #73984324; }
+  .plan:hover .planPrice { color: #376b36; }
+  .plan:hover .comingSoon { background: #d4e8be; }
+  .organize:hover .recipePreview { transform: translateY(-7px) rotate(0deg); box-shadow: -18px 20px 0 #eaf2e2, 0 18px 38px #173d3010; }
+  .organize:hover .recipeIcon { transform: rotate(-8deg) scale(1.06); }
+  .organize:hover .pdfBadge { transform: translateY(-5px) rotate(0deg); }
+  .organize:hover .organizeCopy li { transform: translateX(5px); }
+  .organize:hover .organizeCopy li svg { transform: scale(1.15); }
+  .interactiveMascot:hover { animation: mascotWave 950ms ease-in-out; transform: rotate(var(--mascot-angle)) scale(1.035); }
+}
+@keyframes mascotWave {
+  0% { transform: rotate(var(--mascot-angle)) scale(1); }
+  25% { transform: translateY(-12px) rotate(calc(var(--mascot-angle) - 7deg)) scale(1.035); }
+  50% { transform: translateY(-5px) rotate(calc(var(--mascot-angle) + 6deg)) scale(1.035); }
+  75% { transform: translateY(-9px) rotate(calc(var(--mascot-angle) - 3deg)) scale(1.035); }
+  100% { transform: rotate(var(--mascot-angle)) scale(1.035); }
 }

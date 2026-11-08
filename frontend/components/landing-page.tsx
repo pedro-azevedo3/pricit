@@ -64,7 +64,7 @@ export function LandingPage() {
         </div>
         <div data-reveal="zoom" className={styles.heroArt}>
           <div className={styles.orbit}/><div className={styles.artLabel}>SEU TALENTO TEM VALOR.</div>
-          <Image src="/mascot-cool.png" alt="Mascote do pricit, uma sacola sorridente de óculos escuros fazendo sinal de tudo certo" width={480} height={480} sizes="(max-width: 700px) 85vw, 480px" priority className={styles.heroMascot}/>
+          <Image src="/mascot-cool.png" alt="Mascote do pricit, uma sacola sorridente de óculos escuros fazendo sinal de tudo certo" width={480} height={480} sizes="(max-width: 700px) 85vw, 480px" priority className={`${styles.heroMascot} ${styles.interactiveMascot}`}/>
           <div className={styles.costTag}><span className={styles.tagIcon}><Check size={18}/></span><div><small>Todos os custos na conta</small><strong>Preço com confiança.</strong></div></div>
           <div className={styles.talentTag}><MoveUpRight size={22}/><span>Seu trabalho.<br/><strong>Seu valor.</strong></span></div>
           <span className={styles.sparkle} aria-hidden="true">✳</span>
@@ -77,7 +77,7 @@ export function LandingPage() {
       </section>
       <section id="simulador" className={styles.demoSection}>
         <div className={`${styles.container} ${styles.demoGrid}`}>
-          <div data-reveal="left" className={styles.demoCopy}><span className={styles.eyebrow}>VAMOS TIRAR DO PAPEL?</span><h2>Um preço que<br/>faz sentido.<br/><span>Até nos centavos.</span></h2><p>Quanto custa produzir uma unidade? Quanto você quer acrescentar sobre esse custo? Mexa nos valores e veja a conta acontecer.</p><div className={styles.demoFootnote}><Mascot size={82}/><span>O preço começa no custo.<br/><strong>E inclui o valor do seu trabalho.</strong></span></div></div>
+          <div data-reveal="left" className={styles.demoCopy}><span className={styles.eyebrow}>VAMOS TIRAR DO PAPEL?</span><h2>Um preço que<br/>faz sentido.<br/><span>Até nos centavos.</span></h2><p>Quanto custa produzir uma unidade? Quanto você quer acrescentar sobre esse custo? Mexa nos valores e veja a conta acontecer.</p><div className={styles.demoFootnote}><Mascot size={82} className={styles.interactiveMascot}/><span>O preço começa no custo.<br/><strong>E inclui o valor do seu trabalho.</strong></span></div></div>
           <div data-reveal="right" className={styles.calculator}>
             <div className={styles.calcHeading}><span><ChartNoAxesCombined size={19}/> Seu preço, na prática</span><small>DEMONSTRAÇÃO</small></div>
             <label htmlFor="demo-cost">Custo por unidade <span>Inclua todos os custos de produção</span></label>
@@ -118,7 +118,7 @@ export function LandingPage() {
         </div>
       </section>
       <section id="duvidas" className={`${styles.container} ${styles.faq}`}><div data-reveal="left"><span className={styles.eyebrow}>PODE PERGUNTAR</span><h2>Sem dúvidas<br/>na receita.</h2><p>Algumas respostas antes<br/>de colocar a mão na massa.</p></div><div className={styles.questions}>{questions.map(([q,a], index)=><details data-reveal="soft" data-reveal-offset={index * 12} key={q}><summary>{q}<Plus size={19}/></summary><p>{a}</p></details>)}</div></section>
-      <section className={`${styles.container} ${styles.finalSection}`}><div data-reveal="zoom" className={styles.finalCta}><div><span className={styles.eyebrow}>SEU PRÓXIMO PREÇO COMEÇA AQUI</span><h2>Capriche na receita.<br/>Acerte na conta.</h2><Link href="/cadastro" className={styles.darkButton}>Começar a precificar <ArrowUpRight size={20}/></Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} sizes="(max-width: 700px) 160px, 260px"/></div></section>
+      <section className={`${styles.container} ${styles.finalSection}`}><div data-reveal="zoom" className={styles.finalCta}><div><span className={styles.eyebrow}>SEU PRÓXIMO PREÇO COMEÇA AQUI</span><h2>Capriche na receita.<br/>Acerte na conta.</h2><Link href="/cadastro" className={styles.darkButton}>Começar a precificar <ArrowUpRight size={20}/></Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} sizes="(max-width: 700px) 160px, 260px" className={styles.interactiveMascot}/></div></section>
     </main>
     <footer className={`${styles.container} ${styles.footer}`}><Link href="/" className={styles.footerLogo} aria-label="pricit — início"><Image src="/pricit-logo-dark-green.png" alt="pricit" width={96} height={42}/></Link><span>Receita boa merece preço certo.</span><a href="#conteudo">Voltar ao topo ↑</a></footer>
   </div>;
