@@ -62,3 +62,50 @@
 .emailButton:disabled { opacity: .65; cursor: wait; }
 .loginError { color: #a12424; font-size: 14px; line-height: 1.5; }
 .divider { text-align: center; color: #66756b; font-size: 13px; }
+
+/* Entrance motion settles quickly so the form stays comfortable to use. */
+.header { animation: authEnter 380ms ease-out both; }
+.story { animation: storyEnter 600ms cubic-bezier(.2,.65,.3,1) both; }
+.formContent { animation: authEnter 450ms ease-out both; }
+.formContent h1 { animation: authEnter 450ms 60ms ease-out both; }
+.description { animation: authEnter 450ms 110ms ease-out both; }
+.emailForm, .googleButton { animation: authEnter 450ms 170ms ease-out both; }
+.benefits { animation: authEnter 450ms 220ms ease-out both; }
+.switchMode { animation: authEnter 450ms 270ms ease-out both; }
+.art > img { transform-origin: 50% 85%; animation: greet 700ms ease-out, authFloat 1800ms 700ms ease-in-out 2; }
+.artNote { animation: noteEnter 550ms 250ms ease-out backwards; }
+.notice, .loginError { animation: authEnter 220ms ease-out; }
+.googleButton, .emailButton { transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease; }
+.emailForm input { transition: border-color 180ms ease, box-shadow 180ms ease; }
+.emailForm input:focus { border-color: #31634c; box-shadow: 0 0 0 3px #31634c14; }
+.back svg, .switchMode svg, .benefits li, .benefits svg { transition: transform 220ms ease; }
+.circle { transition: transform 450ms ease; }
+.circle::after { transition: transform 650ms ease; }
+.artNote { transition: transform 350ms ease; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .googleButton:not(:disabled):hover, .emailButton:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 8px 20px #173d301a; }
+  .emailButton:not(:disabled):hover { background: #24543f; }
+  .googleButton:not(:disabled):active, .emailButton:not(:disabled):active { transform: translateY(0); }
+  .back:hover svg { transform: translateX(-4px); }
+  .switchMode a:hover svg { transform: translate(3px, -3px); }
+  .benefits li:hover { transform: translateX(5px); }
+  .benefits li:hover svg { transform: rotate(-8deg) scale(1.1); }
+  .art:hover .circle { transform: scale(1.045); }
+  .art:hover .circle::after { transform: rotate(24deg); }
+  .art:hover .artNote { transform: translateY(-5px) rotate(-2deg); }
+  .art > img:hover { animation: authWave 950ms ease-in-out; transform: rotate(6deg) scale(1.035); }
+}
+@keyframes authEnter { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@keyframes storyEnter { from { opacity: 0; translate: -16px 0; scale: .985; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes noteEnter { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@keyframes authFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes authWave {
+  0% { transform: rotate(6deg) scale(1); }
+  25% { transform: translateY(-12px) rotate(-1deg) scale(1.035); }
+  50% { transform: translateY(-5px) rotate(12deg) scale(1.035); }
+  75% { transform: translateY(-9px) rotate(3deg) scale(1.035); }
+  100% { transform: rotate(6deg) scale(1.035); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; }
+}
