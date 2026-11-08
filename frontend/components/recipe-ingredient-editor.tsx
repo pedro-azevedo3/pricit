@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { baseUnit, compatibleUnits, costLabel, measurementOptions, type MeasurementUnit } from '@/lib/measurements';
 import { Ingredient } from '@/lib/types';
 import { api } from '@/lib/api';
-import { money, perGram } from '@/lib/calculations';
+import { money, perBaseUnit } from '@/lib/calculations';
 import { DecimalInput } from './ui/decimal-input';
 import { Button } from './ui/button';
 import { ErrorBox, Modal } from './shared';
@@ -50,15 +51,15 @@ export function RecipeIngredientEditor({ ingredient, onClose, onSaved }: {
             <DecimalInput required type="number" min="0.01" step="0.01" value={form.package_quantity} onChange={e => setForm({ ...form, package_quantity: e.target.value })} />
           </label>
           <label>Unidade de medida
-            <select value={form.measurement_unit} onChange={e => setForm({ ...form, measurement_unit: e.target.value as 'g' | 'kg' })}>
-              <option value="g">Gramas (g)</option><option value="kg">Quilogramas (kg)</option>
+            <select value={form.measurement_unit} onChange={e => setForm({ ...form, measurement_unit: e.target.value as MeasurementUnit })}>
+              {measurementOptions.filter(option=>compatibleUnits(ingredient.measurement_unit).includes(option.value)).map(option=><option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
           </label>
         </div>
         <label>Valor pago pela embalagem (R$)
           <DecimalInput required type="number" min="0" step="0.01" value={form.package_price} onChange={e => setForm({ ...form, package_price: e.target.value })} />
         </label>
-        <div className="notice">Custo por grama: <strong>{money(perGram(form))}</strong><br />Custo por quilograma: <strong>{money(perGram(form).mul(1000))}</strong></div>
+        <div className="notice">{costLabel(form.measurement_unit)}: <strong>{money(perBaseUnit(form))}</strong>{baseUnit(form.measurement_unit)==='g'&&<><br />Custo por quilograma: <strong>{money(perBaseUnit(form).mul(1000))}</strong></>}</div>
       </div>
       <ErrorBox message={error} />
       <div className="mt-6 flex justify-end gap-3">

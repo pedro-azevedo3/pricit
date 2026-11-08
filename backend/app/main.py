@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
 from .database import get_db
+from .measurements import base_unit
 from .models import Ingredient, Recipe, RecipeIngredient, RevenueSimulation
 from .schemas import IngredientIn, IngredientOut, RecipeIn, RecipeOut, SimulationIn, SimulationOut, SimulationResult
 from .services import get_or_404, ingredient_output, recipe_output, write_recipe
@@ -56,7 +57,13 @@ def create_ingredient(data: IngredientIn, db: Session = DB):
 
 @protected.put(P+'/ingredients/{id}', response_model=IngredientOut)
 def update_ingredient(id: UUID, data: IngredientIn, db: Session = DB):
-    obj = get_or_404(db, Ingredient, id)
+    obj = db.scalar(select(Ingredient).where(Ingredient.id == id).with_for_update())
+    if obj is None:
+        raise HTTPException(404, 'Ingrediente não encontrado.')
+    if base_unit(data.measurement_unit) != base_unit(obj.measurement_unit):
+        used = db.scalar(select(RecipeIngredient.id).where(RecipeIngredient.ingredient_id == id).limit(1))
+        if used:
+            raise HTTPException(409, 'Este ingrediente já está em receitas. Remova os vínculos antes de trocar entre massa, volume e unidade.')
     for k,v in data.model_dump().items():
         setattr(obj,k,v)
     db.commit()

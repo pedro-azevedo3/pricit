@@ -32,7 +32,7 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 
 ## Fluxo de uso
 
-1. Em **Ingredientes**, informe o nome, a quantidade em g/kg e o valor da embalagem. Consulte os custos por grama e quilograma. Pesquise, ordene, edite e arquive pelo menu da tabela.
+1. Em **Ingredientes**, informe o nome, a quantidade em g, kg, ml ou unidade e o valor da embalagem. Consulte o custo por grama, mililitro ou unidade (e por quilograma para ingredientes de massa). Pesquise, ordene, edite e arquive pelo menu da tabela.
 2. Em **Receitas**, cadastre o rendimento, o tempo de produção e os ingredientes. Acrescente embalagens, despesas operacionais e mão de obra. Os resultados aparecem imediatamente.
 3. Defina o lucro desejado sobre custo (markup). O preço praticado é independente do sugerido; deixá-lo vazio faz o sistema utilizar o sugerido.
 4. Salve e reabra a receita. Exporte o PDF da versão salva ou abra **Precificar vendas**.
@@ -149,7 +149,7 @@ Os registros temporários usados na validação inicial foram removidos; a aplic
 
 ## Edição de ingredientes dentro da receita
 
-Novos ingredientes usam gramas (`g`) por padrão, com embalagem inicial de 1.000 g. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade (g ou kg) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
+Novos ingredientes usam gramas (`g`) por padrão, com embalagem inicial de 1.000 g. Na receita, escolha um item da biblioteca, informe a quantidade usada e a unidade compatível com o cadastro (g/kg, ml ou un) e pressione **Adicionar ingrediente**; apenas selecionar não o inclui. Quantidade e unidade utilizadas continuam editáveis na própria linha. O botão de lápis abre o cadastro do ingrediente para alterar nome, embalagem, unidade e preço sem fechar a receita. Essas alterações são salvas na biblioteca e refletem em todas as receitas vinculadas; os históricos permanecem preservados.
 
 A área anteriormente chamada Simulador agora aparece como **Precificação**, inclusive nos botões, históricos e PDFs. Os endpoints `/simulations` continuam compatíveis.
 
@@ -163,7 +163,7 @@ A interface usa bordô, branco e marrom. O botão de sol/lua no cabeçalho alter
 - O limite é comparado ao valor original: 5,269 é menor que 5,27 e recebe apenas o arredondamento normal para duas casas (5,27).
 - Valores negativos seguem a mesma regra em magnitude, preservando o sinal (−5,27 → −5,30).
 - Telas e PDFs usam duas casas para moedas, percentuais e quantidades decimais. Valores pequenos podem aparecer como 0,00, mas continuam contribuindo para os custos com precisão integral.
-- A formatação não regrava dados nem arredonda resultados intermediários. Campos em repouso exibem o padrão; ao editar, apresentam o valor em centésimos para permitir sua alteração. Abrir um cadastro sem alterar o campo preserva o valor original salvo.
+- A formatação não regrava dados nem arredonda resultados intermediários. Campos em repouso exibem o padrão; ao editar, mantêm o valor visível para preservar o cursor e a seleção do campo. Abrir um cadastro sem alterar o campo preserva o valor original salvo.
 - Totais são calculados a partir dos valores originais, e não pela soma dos números arredondados exibidos.
 
 ## Telas de acesso
@@ -198,3 +198,15 @@ Consulte [proteção de logs, banco e backups](docs/PRIVACIDADE.md) para chaves,
 ## Deploy no Railway
 
 Consulte [o passo a passo do Railway](docs/RAILWAY.md) para configurar os três serviços, as variáveis, as chaves e o primeiro usuário.
+
+## Ingredientes por massa, volume e unidade
+
+- `g` e `kg` pertencem à mesma medida: 1 kg = 1.000 g. O sistema calcula custo por grama e quilograma.
+- `ml` calcula custo por mililitro, sem conversão automática para gramas.
+- `un` calcula custo por unidade. Exemplo: 12 ovos por R$ 18,00 custam R$ 1,50 cada; usar 2 ovos custa R$ 3,00. Quantidades fracionadas são permitidas, como meio ovo.
+- Uma receita pode combinar todas essas medidas. O seletor oferece apenas unidades compatíveis com cada ingrediente, e a API recusa combinações incompatíveis.
+- Ingredientes já vinculados a receitas não podem trocar entre massa, volume e unidade; a API retorna 409 para preservar o significado das quantidades. Alterações g ↔ kg continuam permitidas. O editor dentro da receita preserva a mesma medida do ingrediente.
+- A API fornece `base_unit` e `cost_per_base_unit`. Os campos legados `cost_per_gram` e `cost_per_kg` continuam disponíveis para g/kg e retornam `null` para ml/un. Snapshots históricos sem os campos novos continuam legíveis e exportáveis.
+- Nenhuma migração de dados é necessária: as medidas continuam armazenadas nos campos criptografados existentes. Publique primeiro o backend atualizado e depois o frontend.
+
+Os planos da landing permanecem em breve: 1 mês por R$ 14,90; 6 meses por R$ 79,90 (R$ 13,32/mês); 1 ano por R$ 129,90 (R$ 10,83/mês), com 27% off sobre 12 mensalidades de R$ 14,90. As equivalências mensais são arredondadas para centavos.

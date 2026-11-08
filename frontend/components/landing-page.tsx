@@ -10,14 +10,14 @@ import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
 
 const features = [
-  { icon: Leaf, number: '01', title: 'Tudo começa no ingrediente.', text: 'Cadastre o preço e a quantidade da embalagem. O custo por grama e por quilo fica por nossa conta.', detail: 'Sua biblioteca, sempre à mão.' },
+  { icon: Leaf, number: '01', title: 'Tudo começa no ingrediente.', text: 'Cadastre o preço e a quantidade da embalagem. O custo por grama, mililitro ou unidade fica por nossa conta.', detail: 'Sua biblioteca, sempre à mão.' },
   { icon: BookOpen, number: '02', title: 'Sua receita, de ponta a ponta.', text: 'Some ingredientes, embalagens, despesas e seu tempo de trabalho. Porque cada detalhe entra na conta.', detail: 'Um preço que considera o seu trabalho.' },
   { icon: ChartNoAxesCombined, number: '03', title: 'Venda com os números na mão.', text: 'Simule quantidades, compare a produção em lotes e veja a diferença entre faturamento, custo e lucro.', detail: 'Mais clareza para decidir.' },
 ];
 const plans = [
   { duration: '1 mês', price: '14,90', monthly: 'R$ 14,90 por mês', note: 'Um mês para organizar suas contas.' },
-  { duration: '6 meses', price: '71,90', monthly: 'Aprox. R$ 12,00 por mês', note: 'Mais tempo para acompanhar seu negócio.' },
-  { duration: '1 ano', price: '100,00', monthly: 'Aprox. R$ 8,30 por mês', note: 'Um ano de receitas com os custos na mão.' },
+  { duration: '6 meses', price: '79,90', monthly: 'R$ 13,32 por mês', note: 'Mais tempo para acompanhar seu negócio.' },
+  { duration: '1 ano', price: '129,90', monthly: 'R$ 10,83 por mês', note: 'Um ano de receitas com os custos na mão.' },
 ];
 const questions = [
   ['Para quem é o pricit?', 'Para quem produz alimentos e quer entender seus custos: confeiteiros, pequenos produtores e negócios que trabalham com receitas. Você cadastra os ingredientes, monta as receitas e planeja suas vendas.'],
@@ -111,7 +111,7 @@ export function LandingPage() {
             <p className={styles.planNote}>{plan.note}</p>
             <p className={styles.planPrice}><span>R$</span> {plan.price}</p>
             <p className={styles.planPeriod}>Valor total para {plan.duration}</p>
-            <p className={styles.planMonthly}>{plan.monthly}</p>
+            <p className={styles.planMonthly}>{plan.monthly}</p>{index===2&&<p className={styles.planDiscount}>27% off em relação ao plano mensal</p>}
             <div className={styles.planAvailability}>Assinatura disponível em breve</div>
           </article>)}</div>
           <p className={styles.pricingNote}>Os valores por mês são equivalências aproximadas do total de cada período.</p>

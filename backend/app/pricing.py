@@ -1,15 +1,23 @@
 """Pure Decimal calculations. Never round intermediate values."""
 from decimal import Decimal, DefaultContext, getcontext
+from .measurements import base_unit, base_quantity
 DefaultContext.prec = 50
 getcontext().prec = 50
 ZERO = Decimal(0)
 HUNDRED = Decimal(100)
 
 def grams(quantity, unit):
-    return quantity * (Decimal(1000) if unit == 'kg' else Decimal(1))
+    if base_unit(unit) != 'g':
+        raise ValueError('A unidade não é uma medida de massa.')
+    return base_quantity(quantity, unit)
+
+def cost_per_base_unit(ingredient):
+    return ingredient.package_price / base_quantity(ingredient.package_quantity, ingredient.measurement_unit)
 
 def cost_per_gram(ingredient):
-    return ingredient.package_price / grams(ingredient.package_quantity, ingredient.measurement_unit)
+    if base_unit(ingredient.measurement_unit) != 'g':
+        raise ValueError('O ingrediente não é medido em gramas.')
+    return cost_per_base_unit(ingredient)
 
 def margin(profit, revenue):
     return profit / revenue * HUNDRED if revenue else ZERO

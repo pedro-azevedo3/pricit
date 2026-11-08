@@ -1,5 +1,6 @@
-export type Ingredient = {id:string;name:string;measurement_unit:'g'|'kg';package_quantity:string;package_price:string;is_active:boolean;created_at:string;updated_at:string;cost_per_gram:string;cost_per_kg:string};
-export type Item = {ingredient_id:string;quantity_used:string;measurement_unit:'g'|'kg';name?:string;is_active?:boolean;package_price?:string;cost_per_gram?:string;cost?:string};
+import type { MeasurementUnit, BaseUnit } from './measurements';
+export type Ingredient = {id:string;name:string;measurement_unit:MeasurementUnit;package_quantity:string;package_price:string;is_active:boolean;created_at:string;updated_at:string;cost_per_gram:string|null;cost_per_kg:string|null;cost_per_base_unit:string;base_unit:BaseUnit};
+export type Item = {ingredient_id:string;quantity_used:string;measurement_unit:MeasurementUnit;name?:string;is_active?:boolean;package_price?:string;cost_per_gram?:string|null;cost_per_base_unit?:string|null;base_unit?:BaseUnit|null;cost?:string};
 export type RecipeInput = {name:string;description:string|null;yield_quantity:number;production_time_minutes:number;packaging_unit_cost:string;packaging_quantity:number;operational_expense_percentage:string;hourly_labor_cost:string;desired_markup_percentage:string;selling_price:string|null;ingredients:Item[]};
 export type Pricing = Record<'ingredients_cost'|'packaging_cost'|'operational_cost'|'labor_cost'|'total_cost'|'unit_cost'|'desired_profit'|'suggested_price'|'suggested_margin'|'effective_price'|'effective_profit'|'effective_margin',string>;
 export type Recipe = RecipeInput & {id:string;created_at:string;updated_at:string;pricing:Pricing};

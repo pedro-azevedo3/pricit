@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from .measurements import BASE_UNITS
 from sqlalchemy import Text
 from sqlalchemy.types import TypeDecorator
 
@@ -50,7 +51,7 @@ def encode_value(value, kind):
             raise ValueError('Invalid integer field')
     if kind == 'bool' and not isinstance(value, bool):
         raise ValueError('Invalid boolean field')
-    if kind == 'unit' and value not in ('g', 'kg'):
+    if kind == 'unit' and value not in BASE_UNITS:
         raise ValueError('Invalid unit field')
     if kind == 'name' and (not isinstance(value, str) or not 1 <= len(value) <= 200):
         raise ValueError('Invalid name field')

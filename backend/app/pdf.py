@@ -1,6 +1,7 @@
 from io import BytesIO
 from datetime import datetime
 from .formatting import money, percentage, decimal_text
+from .measurements import base_unit
 from xml.sax.saxutils import escape
 from zoneinfo import ZoneInfo
 from reportlab.lib import colors
@@ -26,7 +27,7 @@ def recipe_story(recipe):
     story = [p(recipe['name'], 'Title'), p(f"Rendimento: {recipe['yield_quantity']} unidades • Produção: {recipe['production_time_minutes']} minutos"), Spacer(1, 5*mm)]
     if recipe.get('description'):
         story += [p(recipe['description']), Spacer(1, 4*mm)]
-    story += [p('Composição da receita', 'Heading2'), table([['Ingrediente', 'Quantidade', 'Custo por grama', 'Custo']] + [[i['name'], f"{decimal_text(i['quantity_used'])} {i['measurement_unit']}", money(i['cost_per_gram']), money(i['cost'])] for i in recipe['ingredients']], [65*mm,32*mm,40*mm,33*mm])]
+    story += [p('Composição da receita', 'Heading2'), table([['Ingrediente', 'Quantidade', 'Custo por medida', 'Custo']] + [[i['name'], f"{decimal_text(i['quantity_used'])} {i['measurement_unit']}", f"{money(i.get('cost_per_base_unit') if i.get('cost_per_base_unit') is not None else i['cost_per_gram'])} / {i.get('base_unit') or base_unit(i['measurement_unit'])}", money(i['cost'])] for i in recipe['ingredients']], [65*mm,32*mm,40*mm,33*mm])]
     rows = [['Precificação', 'Valor'], ['Ingredientes', money(pricing['ingredients_cost'])],
             [f"Embalagens: {recipe['packaging_quantity']} × {money(recipe['packaging_unit_cost'])}", money(pricing['packaging_cost'])],
             [f"Despesas: {percentage(recipe['operational_expense_percentage'])} sobre ingredientes + embalagens", money(pricing['operational_cost'])],

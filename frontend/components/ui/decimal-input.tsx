@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type InputHTMLAttributes } from 'react';
-import { d, displayDecimal } from '@/lib/calculations';
+import { displayDecimal } from '@/lib/calculations';
 
 /** Two-place presentation without rewriting stored decimals when merely opening a form. */
 export function DecimalInput({ value, onFocus, onBlur, onChange, ...props }: InputHTMLAttributes<HTMLInputElement>) {
@@ -13,7 +13,10 @@ export function DecimalInput({ value, onFocus, onBlur, onChange, ...props }: Inp
   return <input {...props} type="number" inputMode="decimal" step="0.01"
     value={editing ? draft : displayed}
     onFocus={event => {
-      setDraft(raw === '' ? '' : d(raw).toFixed(2));
+      // Keep the visible value on focus: rewriting it can reset the browser's
+      // selection and append new digits instead of replacing the field.
+      // The original decimal still stays in the parent until onChange fires.
+      setDraft(event.currentTarget.value);
       setEditing(true);
       onFocus?.(event);
     }}

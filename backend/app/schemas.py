@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from .measurements import MeasurementUnit
 
 Money = Annotated[Decimal, Field(ge=0, max_digits=18, decimal_places=6)]
 Quantity = Annotated[Decimal, Field(gt=0, max_digits=18, decimal_places=6)]
@@ -15,7 +16,7 @@ class Input(BaseModel):
 
 class IngredientIn(Input):
     name: str = Field(min_length=1, max_length=200)
-    measurement_unit: Literal['g', 'kg']
+    measurement_unit: MeasurementUnit
     package_quantity: Quantity
     package_price: Money
     is_active: bool = True
@@ -24,13 +25,15 @@ class IngredientOut(IngredientIn):
     id: UUID
     created_at: datetime
     updated_at: datetime
-    cost_per_gram: Decimal
-    cost_per_kg: Decimal
+    cost_per_gram: Decimal | None
+    cost_per_kg: Decimal | None
+    base_unit: Literal['g', 'ml', 'un']
+    cost_per_base_unit: Decimal
 
 class RecipeItemIn(Input):
     ingredient_id: UUID
     quantity_used: Quantity
-    measurement_unit: Literal['g', 'kg']
+    measurement_unit: MeasurementUnit
 
 class RecipeIn(Input):
     name: str = Field(min_length=1, max_length=200)
@@ -56,7 +59,9 @@ class RecipeItemOut(RecipeItemIn):
     name: str
     is_active: bool
     package_price: Decimal
-    cost_per_gram: Decimal
+    cost_per_gram: Decimal | None
+    base_unit: Literal['g', 'ml', 'un'] | None = None
+    cost_per_base_unit: Decimal | None = None
     cost: Decimal
 
 class Pricing(BaseModel):
