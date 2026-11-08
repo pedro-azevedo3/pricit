@@ -155,7 +155,7 @@ A área anteriormente chamada Simulador agora aparece como **Precificação**, i
 
 ## Aparência
 
-A interface usa bordô, branco e marrom. O botão de sol/lua no cabeçalho alterna os temas claro e escuro. A preferência é salva no navegador; na primeira visita, o sistema acompanha a preferência de aparência do dispositivo. PDFs usam a paleta clara para impressão.
+A interface usa bordô, branco e marrom. O botão de sol/lua no cabeçalho alterna os temas claro e escuro. A preferência é salva no navegador; na primeira visita, o sistema acompanha a preferência de aparência do dispositivo. No computador, o botão junto à logo recolhe o menu lateral para mostrar apenas os ícones, ampliando o conteúdo. Essa preferência também é salva no navegador. PDFs usam a paleta clara para impressão.
 
 ## Padrão de arredondamento da exibição
 
@@ -237,3 +237,5 @@ python -m app.assign_legacy pessoa@exemplo.com revisao.json --apply
 ```
 
 Sem `--apply`, nada é alterado. A aplicação é transacional; IDs inexistentes, registros de outra conta e vínculos inconsistentes impedem a atribuição. Ingredientes legados e suas receitas vinculadas precisam ser revisados juntos. Históricos sem receita vinculada exigem revisão explícita de todo o snapshot pelo administrador. Se um ingrediente legado foi reutilizado por pessoas diferentes, revise e separe os dados antes da atribuição; o comando não duplica nem distribui automaticamente esse conteúdo. O acesso ao banco é administrativo e não é limitado pela sessão de um usuário comum.
+
+A prévia pública nas telas de login e cadastro reutiliza o menu, o cabeçalho e a biblioteca de ingredientes do app com exemplos fixos. Ela é inerte e não consulta sessões nem dados de clientes.

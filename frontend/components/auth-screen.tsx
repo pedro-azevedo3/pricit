@@ -3,7 +3,8 @@
 import { type FormEvent, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, ArrowUpRight, Check, Info, Leaf, BookOpen, ChartNoAxesCombined, ArrowRight, Settings2, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Check, Info, Leaf, ArrowRight } from 'lucide-react';
+import { ApplicationPreview } from './application-preview';
 import { api } from '@/lib/api';
 import styles from './auth-screen.module.css';
 
@@ -13,32 +14,10 @@ function GoogleMark() {
 
 function ProductPreview({ register }: { register: boolean }) {
   return <aside className={styles.previewPanel} aria-label="Conheça o pricit">
-    <div className={styles.previewWindow} aria-label="Prévia ilustrativa de uma receita no pricit">
-      <div className={styles.previewSidebar} aria-hidden="true">
-        <span className={styles.previewBrand}>p<span>·</span></span>
-        <span><Leaf size={21}/></span><span className={styles.previewActive}><BookOpen size={21}/></span>
-        <span><ChartNoAxesCombined size={21}/></span><span className={styles.previewSettings}><Settings2 size={21}/></span>
-      </div>
-      <div className={styles.previewContent}>
-        <div className={styles.previewTopline}><span>Meu negócio <span>/</span> Receitas</span><span className={styles.exampleLabel}>PRÉVIA ILUSTRATIVA</span></div>
-        <div className={styles.previewHeading}><div><span className={styles.previewEyebrow}>CADA DETALHE NA CONTA</span><h2>Brownie da casa</h2><p>Sua receita boa. Seu preço certo.</p></div><span className={styles.recipeSelector}>Minhas receitas <ChevronDown size={13}/></span></div>
-        <div className={styles.previewMetrics}>
-          <div><span>Custo da receita</span><strong><small>R$</small> 54,00</strong><p>12 unidades de rendimento</p></div>
-          <div><span>Custo por unidade</span><strong><small>R$</small> 4,50</strong><p>Todos os custos incluídos</p></div>
-          <div className={styles.suggestedPrice}><span>Preço sugerido</span><strong><small>R$</small> 7,20</strong><p><Check size={13}/> Markup de 60%</p></div>
-        </div>
-        <div className={styles.previewDetails}>
-          <div className={styles.costComposition}><h3><ChartNoAxesCombined size={17}/> De onde vem o custo?</h3><div className={styles.costBar} aria-hidden="true"><span/><span/><span/></div>
-            <div className={styles.costRow}><span><i/>Ingredientes</span><strong>R$ 36,00</strong></div>
-            <div className={styles.costRow}><span><i/>Embalagens</span><strong>R$ 6,00</strong></div>
-            <div className={styles.costRow}><span><i/>Despesas e mão de obra</span><strong>R$ 12,00</strong></div>
-            <div className={styles.costTotal}><span>Custo total</span><strong>R$ 54,00</strong></div>
-          </div>
-          <div className={styles.priceBreakdown}><h3><BookOpen size={17}/> Cada unidade, por inteiro.</h3><div className={styles.priceEquation}><span>Custo<strong>R$ 4,50</strong></span><span>+</span><span>Resultado<strong>R$ 2,70</strong></span></div><div className={styles.resultTotal}><span>Seu preço sugerido</span><strong>R$ 7,20</strong></div><p>Mais clareza para valorizar o seu trabalho.</p></div>
-        </div>
-        <div className={styles.previewRecipeList}><h3>Suas receitas, organizadas.</h3><div><span><BookOpen size={15}/> Brownie da casa</span><span>12 unidades</span><strong>R$ 7,20 / un.</strong><ArrowRight size={16}/></div><div><span><BookOpen size={15}/> Brigadeiro tradicional</span><span>30 unidades</span><span>Ver receita</span><ArrowRight size={16}/></div></div>
-      </div>
+    <div className={styles.previewWindow} role="img" aria-label="Prévia da biblioteca de ingredientes do pricit com dados de exemplo">
+      <ApplicationPreview/>
     </div>
+    <span className={styles.exampleLabel}>DADOS DE EXEMPLO</span>
     <div className={styles.mascotSticker}><Image src={register ? '/mascot-happy.png' : '/mascot-cool.png'} alt={register ? 'Mascote do pricit sorrindo para dar boas-vindas' : 'Mascote do pricit de óculos escuros fazendo sinal de tudo certo'} width={150} height={150} sizes="150px" priority/></div>
     <div className={styles.previewCaption}><span className={styles.captionEyebrow}>MENOS ACHISMO. MAIS PRICIT.</span><h2>{register ? <><em>Seu talento tem valor.</em><br/>Vamos colocar na conta?</> : <><em>Do ingrediente ao lucro,</em><br/>tudo faz mais sentido.</>}</h2><p>Ingredientes, receitas e preços organizados para o seu negócio.</p><span className={styles.captionLine} aria-hidden="true"/></div>
   </aside>;

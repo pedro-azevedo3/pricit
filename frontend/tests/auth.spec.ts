@@ -47,7 +47,7 @@ test('login por e-mail exibe erro e envia as credenciais', async ({page}) => {
 });
 
 test('painel sem sessão redireciona para login', async ({browser}) => {
-  const context = await browser.newContext();
+  const context = await browser.newContext({storageState:{cookies:[],origins:[]}});
   const page = await context.newPage();
   await page.goto('/app');
   await expect(page).toHaveURL(/\/login$/);
@@ -56,7 +56,7 @@ test('painel sem sessão redireciona para login', async ({browser}) => {
 
 
 test('servidor bloqueia /app sem JavaScript e com cookie falso', async ({browser, baseURL}) => {
-  const context = await browser.newContext({javaScriptEnabled:false});
+  const context = await browser.newContext({javaScriptEnabled:false,storageState:{cookies:[],origins:[]}});
   try {
     const response = await context.request.get('/app', {maxRedirects:0});
     expect(response.status()).toBe(307);
@@ -79,7 +79,7 @@ test('sessão válida permite acesso direto e sessão revogada bloqueia acesso',
   const email = process.env.E2E_AUTH_EMAIL;
   const password = process.env.E2E_AUTH_PASSWORD;
   test.skip(!email || !password, 'Requer conta temporária no banco de testes.');
-  const context = await browser.newContext();
+  const context = await browser.newContext({storageState:{cookies:[],origins:[]}});
   try {
     const page = await context.newPage();
     await page.goto('/login');
@@ -103,4 +103,22 @@ test('sessão válida permite acesso direto e sessão revogada bloqueia acesso',
   } finally {
     await context.close();
   }
+});
+
+
+test('prévia pública usa a biblioteca real com exemplos e não consulta dados privados',async({page})=>{
+  const calls:string[]=[];
+  page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/v1/'))calls.push(request.url());});
+  for(const route of ['/login','/cadastro']){
+    await page.goto(route);
+    const preview=page.locator('[data-application-preview]');
+    await expect(preview).toHaveAttribute('inert','');
+    await expect(preview).toHaveAttribute('aria-hidden','true');
+    await expect(preview.locator('h1')).toHaveText('Biblioteca de ingredientes');
+    await expect(preview.locator('tbody tr')).toHaveCount(4);
+    await expect(preview.locator('tbody')).toContainText('Farinha de trigo');
+    await expect(preview.locator('.brand-sidebar')).toHaveCount(1);
+    await expect(page.getByRole('button',{name:/Ativar tema/})).toHaveCount(0);
+  }
+  expect(calls).toEqual([]);
 });

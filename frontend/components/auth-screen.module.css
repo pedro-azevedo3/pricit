@@ -34,54 +34,9 @@
 .benefits li { display: flex; align-items: center; gap: 9px; font-size: 11px; color: #597067; }
 .benefits svg { color: #58884c; flex-shrink: 0; }
 .previewPanel { position: relative; min-height: 820px; border-radius: 32px; background: #f3f6f8; overflow: hidden; }
-.previewWindow { position: absolute; left: 20px; top: 20px; width: calc(100% + 105px); min-width: 770px; height: 650px; display: grid; grid-template-columns: 70px 1fr; background: #fff; border: 1px solid #edf1f3; border-radius: 26px; overflow: hidden; box-shadow: 0 12px 40px #28474605; }
+.previewWindow { position: absolute; left: 20px; top: 20px; width: calc(100% + 105px); min-width: 770px; height: 650px; background: #fff; border: 1px solid #edf1f3; border-radius: 26px; overflow: hidden; box-shadow: 0 12px 40px #28474605; }
 .previewWindow::after { content: ''; position: absolute; inset: 430px 0 0; background: linear-gradient(transparent, #f3f6f8 90%); pointer-events: none; }
-.previewSidebar { display: flex; flex-direction: column; align-items: center; gap: 18px; border-right: 1px solid #edf1f3; padding-block: 25px; }
-.previewSidebar > span { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 11px; color: #39605b; }
-.previewSidebar .previewBrand { font-size: 33px; font-weight: 800; letter-spacing: -5px; display: block; text-align: center; margin-bottom: 10px; line-height: 1; }
-.previewBrand > span { color: #8dcf52; }
-.previewSidebar .previewActive { background: #c1ff72; color: #234c35; }
-.previewSidebar .previewSettings { margin-top: auto; }
-.previewContent { min-width: 0; padding: 30px 28px; }
-.previewTopline { max-width: calc(100% - 125px); display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #7a8c91; }
-.previewTopline > span:first-child > span { margin-inline: 10px; color: #bcc8c9; }
-.exampleLabel { border: 1px solid #e1e8e8; border-radius: 20px; padding: 6px 9px; font-size: 7px; letter-spacing: 1px; }
-.previewHeading { max-width: calc(100% - 125px); display: flex; justify-content: space-between; align-items: center; margin-top: 31px; gap: 20px; }
-.previewEyebrow { display: block; font-size: 7px; letter-spacing: 1.4px; color: #759084; margin-bottom: 11px; }
-.previewHeading h2 { font-size: 26px; line-height: 1.2; letter-spacing: -1px; font-weight: 600; }
-.previewHeading p { font-size: 10px; color: #8a9b9d; margin-top: 8px; }
-.recipeSelector { display: flex; align-items: center; gap: 14px; padding: 9px 12px; border: 1px solid #dfe7ed; border-radius: 20px; font-size: 9px; }
-.previewMetrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
-.previewMetrics > div { padding: 20px 16px; border: 1px solid #e1e8eb; border-radius: 15px; }
-.previewMetrics > div > span { display: block; font-size: 10px; color: #71878a; }
-.previewMetrics strong { display: block; margin-top: 13px; font-size: 29px; font-weight: 600; letter-spacing: -1px; }
-.previewMetrics small { font-size: 20px; color: #8ca2a0; font-weight: 500; }
-.previewMetrics p { display: flex; align-items: center; gap: 5px; font-size: 8px; margin-top: 13px; color: #88a196; }
-.previewMetrics .suggestedPrice { background: #f0f8e9; border-color: #d7e9c5; }
-.suggestedPrice strong, .suggestedPrice p { color: #578d32; }
-.previewDetails { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; margin-top: 23px; }
-.costComposition, .priceBreakdown { padding: 20px; border: 1px solid #e1e8eb; border-radius: 16px; }
-.previewDetails h3 { display: flex; align-items: center; gap: 9px; font-size: 11px; font-weight: 500; }
-.costBar { display: flex; height: 18px; gap: 3px; border-radius: 5px; overflow: hidden; margin-block: 24px 20px; }
-.costBar span:nth-child(1) { width: 66.67%; background: #a7e768; }
-.costBar span:nth-child(2) { width: 11.11%; background: #d4e9bd; }
-.costBar span:nth-child(3) { flex: 1; background: #375e4d; }
-.costRow { display: flex; justify-content: space-between; gap: 12px; margin-top: 15px; font-size: 9px; }
-.costRow > span { display: flex; align-items: center; gap: 7px; color: #7c8e90; }
-.costRow i { width: 6px; height: 6px; border-radius: 2px; background: #a7e768; }
-.costRow:nth-of-type(3) i { background: #d4e9bd; }
-.costRow:nth-of-type(4) i { background: #375e4d; }
-.costRow strong { font-weight: 500; }
-.costTotal { display: flex; justify-content: space-between; border-top: 1px solid #e5eceb; margin-top: 18px; padding-top: 15px; font-size: 10px; }
-.priceEquation { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 30px; font-size: 10px; color: #80948e; }
-.priceEquation strong { display: block; font-size: 20px; color: #36564b; margin-top: 9px; font-weight: 500; }
-.resultTotal { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid #e1e9e5; margin-top: 23px; padding-top: 20px; font-size: 10px; }
-.resultTotal strong { color: #699842; font-size: 25px; font-weight: 600; }
-.priceBreakdown > p { color: #8da098; font-size: 9px; line-height: 1.7; margin-top: 18px; }
-.previewRecipeList { margin-top: 24px; padding: 20px; border: 1px solid #e1e8eb; border-radius: 16px; }
-.previewRecipeList h3 { font-size: 11px; font-weight: 500; margin-bottom: 15px; }
-.previewRecipeList > div { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #e8edeb; padding-block: 15px; font-size: 9px; color: #7d9391; }
-.previewRecipeList > div > span:first-child { display: flex; align-items: center; gap: 8px; }
+.exampleLabel { position: absolute; top: 18px; right: 28px; border: 1px solid #dce3da; border-radius: 20px; padding: 6px 9px; background: #fff; color: #6c7d70; font-size: 7px; letter-spacing: 1px; pointer-events: none; }
 .previewCaption { position: absolute; left: 26px; right: 26px; bottom: 42px; text-align: center; }
 .captionEyebrow { display: block; color: #779289; font-size: 8px; letter-spacing: 1.8px; margin-bottom: 15px; }
 .previewCaption h2 { font-size: clamp(25px, 2.2vw, 34px); font-weight: 600; line-height: 1.18; letter-spacing: -1.2px; }
@@ -113,7 +68,6 @@
 @media (max-width: 1100px) {
   .page { grid-template-columns: 46% 54%; }
   .formPanel { padding-inline: 35px; }
-  .previewHeading h2 { font-size: 23px; }
   .previewWindow { left: 16px; top: 16px; }
   .previewCaption { left: 22px; right: 22px; }
   .previewCaption h2 { font-size: 28px; }
