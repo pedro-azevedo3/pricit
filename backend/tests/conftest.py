@@ -6,9 +6,11 @@ from sqlalchemy.orm import Session
 from app.database import engine, get_db
 from app.main import app
 from app.auth import current_user
+from app.login_limit import LoginLimiter
 
 @pytest.fixture
-def client(request):
+def client(request, monkeypatch):
+    monkeypatch.setattr(app.state, 'login_limiter', LoginLimiter())
     with engine.connect() as connection:
         transaction = connection.begin()
         with Session(bind=connection, join_transaction_mode='create_savepoint', expire_on_commit=False) as session:

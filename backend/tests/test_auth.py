@@ -76,3 +76,15 @@ def test_origin_and_protected_routes(client):
         assert client.get('/api/v1/' + path).status_code == 401
         assert client.post('/api/v1/' + path, json={}).status_code == 401
     assert client.get('/health').status_code == 200
+
+
+def test_locked_account_is_rejected_before_password_work(client, monkeypatch):
+    db, user = create_user()
+    user.locked_until = now() + timedelta(minutes=15)
+    db.commit()
+    def forbidden(*_):
+        raise AssertionError('Locked accounts must not run password hashing')
+    monkeypatch.setattr('app.auth.verify_password', forbidden)
+    response = login(client)
+    assert response.status_code == 429
+    assert int(response.headers['retry-after']) > 0

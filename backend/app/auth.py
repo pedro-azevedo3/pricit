@@ -74,9 +74,11 @@ def current_user(request: Request, db: Session = Depends(get_db)):
 @router.post('/login', dependencies=[Depends(check_origin)])
 def login(data: Credentials, response: Response, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.email == data.email).with_for_update())
-    valid = verify_password(data.password, user.password_hash if user else DUMMY_HASH)
     if user and user.locked_until and user.locked_until > now():
-        raise HTTPException(429, 'Muitas tentativas. Aguarde 15 minutos e tente novamente.')
+        remaining = max(1, int((user.locked_until - now()).total_seconds()) + 1)
+        raise HTTPException(429, 'Muitas tentativas. Aguarde 15 minutos e tente novamente.',
+                            headers={'Retry-After': str(remaining), 'Cache-Control': 'no-store'})
+    valid = verify_password(data.password, user.password_hash if user else DUMMY_HASH)
     if not user or not valid or not user.is_active:
         if user:
             user.failed_attempts += 1

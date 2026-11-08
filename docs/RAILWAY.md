@@ -17,7 +17,7 @@ AUTH_COOKIE_SECURE=true
 CORS_ORIGINS=https://DOMINIO-PUBLICO-DO-FRONT
 ```
 
-Adicione também `LOG_PUBLIC_KEY_PEM` e `DATA_KEYS_JSON` conforme abaixo. A URL padrão do PostgreSQL é convertida automaticamente para o driver psycopg. As migrações rodam antes do servidor; o banco vazio recebe as tabelas automaticamente. Comece com uma réplica do backend.
+Adicione também `LOG_PUBLIC_KEY_PEM` e `DATA_KEYS_JSON` conforme abaixo. A URL padrão do PostgreSQL é convertida automaticamente para o driver psycopg. As migrações rodam antes do servidor; o banco vazio recebe as tabelas automaticamente. Comece com uma réplica do backend. O login admite 10 requisições/minuto por origem, 60/minuto no total e 2 simultâneas por processo; os contadores são locais e reiniciam com o processo. Como a conexão pode vir do proxy do frontend ou do Railway, várias pessoas podem compartilhar a cota por origem. Ao usar mais workers/réplicas, os limites se multiplicam; para uma cota compartilhada, adote Redis ou limitação na borda. Não configure confiança irrestrita em cabeçalhos de IP encaminhados.
 
 ## Frontend: front
 

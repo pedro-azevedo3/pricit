@@ -180,6 +180,11 @@ O comando solicita a senha e a confirmação sem exibir o que você digita. Use 
 
 Entre em http://localhost:3000/login. A rota `/app` valida a sessão no servidor a cada solicitação, antes de renderizar o painel; sessões ausentes, inválidas, expiradas ou revogadas redirecionam para `/login`. A API também exige sessão válida em todas as rotas de negócio. A sessão dura sete dias, usa cookie HttpOnly/SameSite e é revogada ao clicar em **Sair**. Após cinco tentativas incorretas, a conta fica bloqueada por 15 minutos. Definir `users.is_active = false` bloqueia a conta e suas sessões imediatamente.
 
+O login possui controle de entrada antes de ler o corpo, consultar o banco ou calcular o hash: até **10 requisições por origem em uma janela móvel de 60 segundos**, **60 no total por minuto** e **2 requisições simultâneas**, por processo do backend. Tentativas com e-mails inexistentes, senhas válidas e corpos inválidos também entram na cota. O excesso recebe HTTP 429 com `Retry-After` e não fica em fila. Contas já bloqueadas são rejeitadas antes de calcular a senha.
+
+A origem é o endereço de conexão recebido pelo servidor; cabeçalhos arbitrários `X-Forwarded-For` e `X-Real-IP` não alteram a cota. Atrás de proxies, usuários podem compartilhar a mesma origem e, portanto, a mesma cota de 10/minuto. Os contadores têm memória limitada e expiram após a janela; reiniciar o processo os zera. Para limites compartilhados entre múltiplos workers ou réplicas, use um armazenamento central (como Redis) ou um limitador na borda. O bloqueio de conta de 15 minutos continua persistido no PostgreSQL.
+
+
 Todos os usuários acessam os ingredientes, receitas e históricos existentes do mesmo negócio. Não há separação de dados entre contas. Não existe usuário ou senha padrão.
 
 Para implantação com HTTPS, configure `AUTH_COOKIE_SECURE=true` e inclua a origem exata do frontend em `CORS_ORIGINS` (lista separada por vírgulas). Em desenvolvimento, localhost e 127.0.0.1 na porta 3000 são permitidos por padrão. A tabela `users` mantém o e-mail em texto para identificação, mas nunca a senha; a tabela `user_sessions` mantém somente o hash dos tokens.
