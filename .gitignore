@@ -1,0 +1,25 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+node_modules/
+.next/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store
+
+.secrets/
+*.encrypted-log
+backups/
+*.dump
+
+# Local agent settings and credentials
+.agents/
+.codex/
+.aws/
+*.pem
+*.key

@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #1b2123;
+  --surface: #ffffff;
+  --surface-soft: color-mix(in srgb, #1b2123 4%, #ffffff);
+  --accent: #c1ff72;
+  --border: color-mix(in srgb, #1b2123 18%, #ffffff);
+  --muted: color-mix(in srgb, #1b2123 75%, #ffffff);
+  --brand: #c1ff72;
+  --brand-hover: color-mix(in srgb, #c1ff72 85%, #1b2123);
+  --brand-text: #1b2123;
+  --brand-soft-text: #1b2123;
+  --on-brand: #1b2123;
+  --danger: #ab233a;
+  --danger-surface: #fff0f1;
+  --radius: .75rem;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #1b2123;
+  --foreground: #ffffff;
+  --surface: #1b2123;
+  --surface-soft: color-mix(in srgb, #ffffff 5%, #1b2123);
+  --accent: #c1ff72;
+  --border: color-mix(in srgb, #ffffff 20%, #1b2123);
+  --muted: color-mix(in srgb, #ffffff 72%, #1b2123);
+  --brand-text: #c1ff72;
+  --danger: #ff9cab;
+  --danger-surface: #44232b;
+}
+
+.brand-sidebar {
+  --surface: #1b2123;
+  --foreground: #ffffff;
+  --muted: #ffffff;
+  --border: color-mix(in srgb, #ffffff 20%, #1b2123);
+  color: var(--foreground);
+}
+.brand-logo { display: block; width: 150px; height: auto; }
+.brand-logo-mobile { width: 76px; padding: 7px 9px; border-radius: 8px; background: transparent; }
+nav button[aria-current="page"], nav button:hover { color: #1b2123; --muted: #1b2123; }
+.number-dot { --brand-text: #1b2123; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; font-size: 14px; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+input, select, textarea { width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 10px 12px; color: var(--foreground); outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--brand-text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-text) 18%, transparent); }
+input[type=checkbox] { width: 16px; min-height: 16px; accent-color: var(--brand); }
+label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); }
+label input, label select, label textarea { margin-top: 7px; font-weight: 400; }
+h1, h2, h3, p { margin: 0; }
+a { text-decoration: none; }
+table { border-collapse: collapse; width: 100%; text-align: left; }
+th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; background: var(--surface-soft); padding: 16px 20px; }
+td { padding: 18px 20px; border-top: 1px solid var(--border); font-size: 13px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.section-title { font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
+.subtle { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.field-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.metric { font-variant-numeric: tabular-nums; letter-spacing: -.7px; }
+.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--muted); }
+.number-dot { display: inline-flex; width: 25px; height: 25px; background: var(--accent); align-items: center; justify-content: center; border-radius: 8px; color: var(--brand-text); font-size: 11px; margin-right: 10px; }
+.notice { padding: 12px 16px; border-radius: 10px; background: var(--surface-soft); color: var(--muted); font-size: 12px; line-height: 1.7; }
+.scroll-table { overflow-x: auto; }
+::selection { background: var(--accent); color: #1b2123; }
+@media(max-width:640px) { .field-grid { grid-template-columns: 1fr; } td,th { padding: 14px 12px; } }
+
+.brand-accent { --foreground: #1b2123; --muted: #1b2123; --brand-text: #1b2123; color: #1b2123; }
+
+/* Motion stays brief and uses opacity/transform to avoid layout shifts. */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialog-enter {
+  from { opacity: 0; scale: .97; }
+  to { opacity: 1; scale: 1; }
+}
+@keyframes dialog-exit {
+  from { opacity: 1; scale: 1; }
+  to { opacity: 0; scale: .98; }
+}
+@keyframes mascot-greet {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  45% { transform: translateY(-5px) rotate(-3deg); }
+  75% { transform: translateY(-2px) rotate(2deg); }
+}
+.page-transition { animation: page-enter 260ms ease-out; }
+.page-transition .panel { animation: page-enter 340ms ease-out; }
+.page-transition .panel:nth-child(2) { animation-duration: 400ms; }
+.page-transition .panel:nth-child(3) { animation-duration: 460ms; }
+.toast-transition { animation: page-enter 240ms ease-out; }
+.dialog-overlay[data-state="open"] { animation: fade-in 180ms ease-out; }
+.dialog-overlay[data-state="closed"] { animation: fade-out 140ms ease-in; }
+.dialog-content[data-state="open"] { animation: dialog-enter 220ms ease-out; }
+.dialog-content[data-state="closed"] { animation: dialog-exit 140ms ease-in; }
+.mascot { object-fit: contain; flex-shrink: 0; animation: mascot-greet 1.2s ease-in-out 2; }
+body, header, .panel, input, select, textarea, footer {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+button, a {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+button:active:not(:disabled), a:active { transform: scale(.97); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
+@media (hover: hover) {
+  button:not(:disabled):hover { transform: translateY(-1px); }
+  .mascot-help:hover .mascot { transform: rotate(-5deg); transition: transform 240ms ease; }
+  tbody tr:hover { background: var(--surface-soft); }
+}
+@media (max-height: 700px) { .mascot-help .mascot { width: 64px; height: 64px; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  button:hover, button:active, a:active, .mascot-help:hover .mascot { transform: none !important; }
+}
+
+/* Public pages stay light without changing the saved in-app preference. */
+html:has([data-public-page]), body:has([data-public-page]) { color-scheme: light; background: #ffffff; }
+[data-public-page] { color-scheme: light; --brand-text: #1b2123; --foreground: #1b2123; --surface: #ffffff; }

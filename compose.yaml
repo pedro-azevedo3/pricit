@@ -1,0 +1,74 @@
+# Preserve the existing Compose project and its database volume after the rebrand.
+name: izyprice
+
+services:
+  db:
+    image: postgres:16-alpine
+    # Do not persist PostgreSQL messages containing SQL or customer values.
+    logging:
+      driver: "none"
+    command: ["postgres", "-c", "logging_collector=off", "-c", "log_statement=none", "-c", "log_min_error_statement=panic", "-c", "log_parameter_max_length=0", "-c", "log_parameter_max_length_on_error=0"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-izyprice}
+      POSTGRES_USER: ${POSTGRES_USER:-izyprice}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-izyprice_local}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  backend:
+    build: ./backend
+    secrets:
+      - log_public_key
+      - backup_public_key
+      - data_keys
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-izyprice}:${POSTGRES_PASSWORD:-izyprice_local}@db:5432/${POSTGRES_DB:-izyprice}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  frontend:
+    build: ./frontend
+    secrets:
+      - log_public_key
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      API_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+volumes:
+  postgres_data:
+
+secrets:
+  log_public_key:
+    file: ./.secrets/log-public.pem
+  backup_public_key:
+    file: ./.secrets/backup-public.pem
+  data_keys:
+    file: ./.secrets/data-keys.json
