@@ -178,7 +178,7 @@ docker compose exec backend python -m app.create_user voce@exemplo.com
 
 O comando solicita a senha e a confirmação sem exibir o que você digita. Use entre 12 e 256 caracteres. Ele normaliza o e-mail, grava o usuário na tabela `users` e armazena apenas o hash scrypt da senha. E-mails duplicados são recusados. Fora do Docker, execute `python -m app.create_user voce@exemplo.com` na pasta `backend`, com `DATABASE_URL` configurada e as migrações aplicadas.
 
-Entre em http://localhost:3000/login. A sessão dura sete dias, usa cookie HttpOnly/SameSite e é revogada ao clicar em **Sair**. Após cinco tentativas incorretas, a conta fica bloqueada por 15 minutos. Definir `users.is_active = false` bloqueia a conta e suas sessões imediatamente.
+Entre em http://localhost:3000/login. A rota `/app` valida a sessão no servidor a cada solicitação, antes de renderizar o painel; sessões ausentes, inválidas, expiradas ou revogadas redirecionam para `/login`. A API também exige sessão válida em todas as rotas de negócio. A sessão dura sete dias, usa cookie HttpOnly/SameSite e é revogada ao clicar em **Sair**. Após cinco tentativas incorretas, a conta fica bloqueada por 15 minutos. Definir `users.is_active = false` bloqueia a conta e suas sessões imediatamente.
 
 Todos os usuários acessam os ingredientes, receitas e históricos existentes do mesmo negócio. Não há separação de dados entre contas. Não existe usuário ou senha padrão.
 

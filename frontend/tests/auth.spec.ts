@@ -53,3 +53,54 @@ test('painel sem sessão redireciona para login', async ({browser}) => {
   await expect(page).toHaveURL(/\/login$/);
   await context.close();
 });
+
+
+test('servidor bloqueia /app sem JavaScript e com cookie falso', async ({browser, baseURL}) => {
+  const context = await browser.newContext({javaScriptEnabled:false});
+  try {
+    const response = await context.request.get('/app', {maxRedirects:0});
+    expect(response.status()).toBe(307);
+    expect(response.headers().location).toBe('/login');
+    expect(await response.text()).not.toContain('Seu espaço de gestão');
+    await context.addCookies([{name:'pricit_session',value:'sessao-inventada',url:baseURL!}]);
+    const forged = await context.request.get('/app', {maxRedirects:0});
+    expect(forged.status()).toBe(307);
+    expect(forged.headers().location).toBe('/login');
+    const page = await context.newPage();
+    await page.goto('/app');
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole('heading', {level:1})).toContainText('Entre e fique');
+  } finally {
+    await context.close();
+  }
+});
+
+test('sessão válida permite acesso direto e sessão revogada bloqueia acesso', async ({browser}) => {
+  const email = process.env.E2E_AUTH_EMAIL;
+  const password = process.env.E2E_AUTH_PASSWORD;
+  test.skip(!email || !password, 'Requer conta temporária no banco de testes.');
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await page.goto('/login');
+    await page.getByLabel('E-mail', {exact:true}).fill(email!);
+    await page.getByLabel('Senha', {exact:true}).fill(password!);
+    await page.getByRole('button', {name:'Entrar com e-mail e senha',exact:true}).click();
+    await expect(page).toHaveURL(/\/app$/);
+    const authenticated = await context.request.get('/app', {maxRedirects:0});
+    expect(authenticated.status()).toBe(200);
+    expect(await authenticated.text()).toContain('Seu espaço de gestão');
+    const cookie = (await context.cookies()).find(cookie => cookie.name === 'pricit_session');
+    expect(cookie).toBeDefined();
+    await page.reload();
+    await expect(page.getByRole('button', {name:'Sair',exact:true})).toBeVisible();
+    await page.getByRole('button', {name:'Sair',exact:true}).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await context.addCookies([cookie!]);
+    const revoked = await context.request.get('/app', {maxRedirects:0});
+    expect(revoked.status()).toBe(307);
+    expect(revoked.headers().location).toBe('/login');
+  } finally {
+    await context.close();
+  }
+});
