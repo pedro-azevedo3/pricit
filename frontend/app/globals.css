@@ -42,6 +42,9 @@
 }
 .brand-logo { display: block; width: 150px; height: auto; }
 .brand-logo-mobile { width: 76px; padding: 7px 9px; border-radius: 8px; background: transparent; }
+.app-logo-dark { display: none; }
+:root[data-theme="dark"] .app-logo-light { display: none; }
+:root[data-theme="dark"] .app-logo-dark { display: block; }
 nav button[aria-current="page"], nav button:hover { color: #1b2123; --muted: #1b2123; }
 .number-dot { --brand-text: #1b2123; }
 
