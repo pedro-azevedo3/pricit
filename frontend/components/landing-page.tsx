@@ -14,6 +14,11 @@ const features = [
   { icon: BookOpen, number: '02', title: 'Sua receita, de ponta a ponta.', text: 'Some ingredientes, embalagens, despesas e seu tempo de trabalho. Porque cada detalhe entra na conta.', detail: 'Um preço que considera o seu trabalho.' },
   { icon: ChartNoAxesCombined, number: '03', title: 'Venda com os números na mão.', text: 'Simule quantidades, compare a produção em lotes e veja a diferença entre faturamento, custo e lucro.', detail: 'Mais clareza para decidir.' },
 ];
+const plans = [
+  { duration: '1 mês', price: '14,90', monthly: 'R$ 14,90 por mês', note: 'Um mês para organizar suas contas.' },
+  { duration: '6 meses', price: '71,90', monthly: 'Aprox. R$ 12,00 por mês', note: 'Mais tempo para acompanhar seu negócio.' },
+  { duration: '1 ano', price: '100,00', monthly: 'Aprox. R$ 8,30 por mês', note: 'Um ano de receitas com os custos na mão.' },
+];
 const questions = [
   ['Para quem é o pricit?', 'Para quem produz alimentos e quer entender seus custos: confeiteiros, pequenos produtores e negócios que trabalham com receitas. Você cadastra os ingredientes, monta as receitas e planeja suas vendas.'],
   ['O que entra no cálculo do preço?', 'Ingredientes, embalagens, despesas operacionais e mão de obra. Sobre o custo, você define um percentual de acréscimo (markup) para chegar ao preço sugerido. Também pode informar o preço que já pratica.'],
@@ -41,6 +46,7 @@ export function LandingPage() {
         <nav className={`${styles.navigation} ${menu ? styles.menuOpen : ''}`} aria-label="Navegação do site">
           <a href="#como-funciona" onClick={() => setMenu(false)}>Como funciona</a>
           <a href="#simulador" onClick={() => setMenu(false)}>Na prática</a>
+          <a href="#precos" onClick={() => setMenu(false)}>Preços</a>
           <a href="#duvidas" onClick={() => setMenu(false)}>Dúvidas</a>
           <Link href="/login" className={styles.mobileAccess}>Entrar <ArrowUpRight size={16}/></Link><Link href="/cadastro" className={styles.mobileAccess}>Registre-se <ArrowUpRight size={16}/></Link>
         </nav>
@@ -93,6 +99,23 @@ export function LandingPage() {
           <div className={styles.pdfBadge}><FileDown size={23}/><span>Sua receita organizada.<br/><strong>Também em PDF.</strong></span></div>
         </div>
         <div data-reveal="right" className={styles.organizeCopy}><span className={styles.eyebrow}>MAIS ORGANIZAÇÃO. MENOS IMPROVISO.</span><h2>Seu negócio merece<br/>mais que uma<br/>conta de cabeça.</h2><p>Consulte seus ingredientes, ajuste suas receitas e revisite as simulações salvas. Os números ficam organizados para você focar na próxima fornada.</p><ul><li><Check/> Custos das receitas atualizados com os ingredientes</li><li><Check/> Comparação entre custo proporcional e lotes completos</li><li><Check/> Receitas e simulações exportadas em PDF</li></ul><Link href="/cadastro" className={styles.textLink}>Conhecer o sistema <ArrowRight size={18}/></Link></div>
+      </section>
+      <section id="precos" className={styles.pricing} aria-labelledby="pricing-title" aria-describedby="pricing-status">
+        <div className={styles.container}>
+          <div data-reveal="up" className={styles.sectionIntro}>
+            <div><span className={styles.eyebrow}>PREÇOS · EM BREVE</span><h2 id="pricing-title">Um plano para<br/>o seu próximo passo.</h2></div>
+            <p id="pricing-status">Nossas assinaturas chegam em breve. Conheça os valores planejados; a contratação ainda não está disponível.</p>
+          </div>
+          <div className={styles.plans}>{plans.map((plan, index) => <article key={plan.duration} data-reveal="up" data-reveal-offset={index * 35} className={`${styles.plan} ${index === 2 ? styles.annualPlan : ''}`} aria-label={`Plano de ${plan.duration}`}>
+            <div className={styles.planHeading}><h3>{plan.duration}</h3><span className={styles.comingSoon}>Em breve</span></div>
+            <p className={styles.planNote}>{plan.note}</p>
+            <p className={styles.planPrice}><span>R$</span> {plan.price}</p>
+            <p className={styles.planPeriod}>Valor total para {plan.duration}</p>
+            <p className={styles.planMonthly}>{plan.monthly}</p>
+            <div className={styles.planAvailability}>Assinatura disponível em breve</div>
+          </article>)}</div>
+          <p className={styles.pricingNote}>Os valores por mês são equivalências aproximadas do total de cada período.</p>
+        </div>
       </section>
       <section id="duvidas" className={`${styles.container} ${styles.faq}`}><div data-reveal="left"><span className={styles.eyebrow}>PODE PERGUNTAR</span><h2>Sem dúvidas<br/>na receita.</h2><p>Algumas respostas antes<br/>de colocar a mão na massa.</p></div><div className={styles.questions}>{questions.map(([q,a], index)=><details data-reveal="soft" data-reveal-offset={index * 12} key={q}><summary>{q}<Plus size={19}/></summary><p>{a}</p></details>)}</div></section>
       <section className={`${styles.container} ${styles.finalSection}`}><div data-reveal="zoom" className={styles.finalCta}><div><span className={styles.eyebrow}>SEU PRÓXIMO PREÇO COMEÇA AQUI</span><h2>Capriche na receita.<br/>Acerte na conta.</h2><Link href="/cadastro" className={styles.darkButton}>Começar a precificar <ArrowUpRight size={20}/></Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} sizes="(max-width: 700px) 160px, 260px"/></div></section>
