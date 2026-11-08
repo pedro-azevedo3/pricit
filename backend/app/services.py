@@ -6,8 +6,8 @@ from .schemas import IngredientIn, IngredientOut, RecipeIn, RecipeOut
 from .pricing import cost_per_base_unit, calculate_recipe
 from .measurements import base_unit, base_quantity
 
-def get_or_404(db, model, id):
-    obj = db.get(model, id)
+def get_or_404(db, model, id, owner_id):
+    obj = db.scalar(select(model).where(model.id == id, model.owner_id == owner_id))
     if obj is None:
         raise HTTPException(404, 'Registro não encontrado.')
     return obj
@@ -25,6 +25,8 @@ def recipe_output(obj):
     items = []
     for item in obj.ingredients:
         ingredient = item.ingredient
+        if obj.owner_id is None or ingredient.owner_id != obj.owner_id:
+            raise HTTPException(404, 'Registro não encontrado.')
         unit_cost = cost_per_base_unit(ingredient)
         items.append(dict(ingredient_id=ingredient.id, quantity_used=item.quantity_used,
                           measurement_unit=item.measurement_unit, name=ingredient.name,
@@ -37,10 +39,12 @@ def recipe_output(obj):
     return RecipeOut(**fields, id=obj.id, created_at=obj.created_at, updated_at=obj.updated_at,
                      ingredients=items, pricing=calculate_recipe(obj, subtotal))
 
-def write_recipe(db, data, obj=None):
+def write_recipe(db, data, owner_id, obj=None):
+    if obj is not None and obj.owner_id != owner_id:
+        raise HTTPException(404, 'Registro não encontrado.')
     existing = {i.ingredient_id for i in obj.ingredients} if obj else set()
     # Lock ingredients to serialize archiving/deletion against recipe edits.
-    ingredients = db.scalars(select(Ingredient).where(Ingredient.id.in_([i.ingredient_id for i in data.ingredients])).with_for_update()).all()
+    ingredients = db.scalars(select(Ingredient).where(Ingredient.id.in_([i.ingredient_id for i in data.ingredients]), Ingredient.owner_id == owner_id).with_for_update()).all()
     lookup = {i.id: i for i in ingredients}
     for item in data.ingredients:
         ingredient = lookup.get(item.ingredient_id)
@@ -51,7 +55,7 @@ def write_recipe(db, data, obj=None):
         if not ingredient.is_active and item.ingredient_id not in existing:
             raise HTTPException(422, 'Ingredientes arquivados não podem ser adicionados.')
     if obj is None:
-        obj = Recipe()
+        obj = Recipe(owner_id=owner_id)
         db.add(obj)
     for key, value in data.model_dump(exclude={'ingredients'}).items():
         setattr(obj, key, value)

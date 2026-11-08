@@ -63,7 +63,7 @@ def test_unknown_emails_and_spoofed_headers_are_limited_before_hashing(client, m
                            headers={'X-Forwarded-For':'198.51.100.1', 'X-Real-IP':'198.51.100.1'})
     assert response.status_code == 429
     assert 1 <= int(response.headers['retry-after']) <= 60
-    assert response.headers['cache-control'] == 'no-store'
+    assert 'no-store' in response.headers['cache-control']
     assert verify.call_count == 3
     assert client.get('/health').status_code == 200
     assert client.get('/api/v1/auth/me').status_code == 401

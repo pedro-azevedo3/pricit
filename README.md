@@ -28,7 +28,7 @@ docker compose logs -f backend frontend
 docker compose down
 ```
 
-O volume `postgres_data` preserva os dados após reiniciar os serviços ou fechar o navegador. `docker compose down -v` apaga esse volume e **todos os dados**. As portas ficam vinculadas apenas ao computador local. O painel e a API exigem autenticação por e-mail e senha. Os usuários compartilham o mesmo espaço de trabalho.
+O volume `postgres_data` preserva os dados após reiniciar os serviços ou fechar o navegador. `docker compose down -v` apaga esse volume e **todos os dados**. As portas ficam vinculadas apenas ao computador local. O painel e a API exigem autenticação por e-mail e senha. Cada conta acessa somente seus ingredientes, receitas e históricos.
 
 ## Fluxo de uso
 
@@ -185,7 +185,7 @@ O login possui controle de entrada antes de ler o corpo, consultar o banco ou ca
 A origem é o endereço de conexão recebido pelo servidor; cabeçalhos arbitrários `X-Forwarded-For` e `X-Real-IP` não alteram a cota. Atrás de proxies, usuários podem compartilhar a mesma origem e, portanto, a mesma cota de 10/minuto. Os contadores têm memória limitada e expiram após a janela; reiniciar o processo os zera. Para limites compartilhados entre múltiplos workers ou réplicas, use um armazenamento central (como Redis) ou um limitador na borda. O bloqueio de conta de 15 minutos continua persistido no PostgreSQL.
 
 
-Todos os usuários acessam os ingredientes, receitas e históricos existentes do mesmo negócio. Não há separação de dados entre contas. Não existe usuário ou senha padrão.
+Cada conta acessa exclusivamente seus ingredientes, receitas, históricos e PDFs. O proprietário é definido pela sessão, nunca por campos enviados pelo navegador. Não existe usuário ou senha padrão. Registros anteriores à migração de isolamento, sem proprietário conhecido, ficam preservados e ocultos até revisão administrativa.
 
 Para implantação com HTTPS, configure `AUTH_COOKIE_SECURE=true` e inclua a origem exata do frontend em `CORS_ORIGINS` (lista separada por vírgulas). Em desenvolvimento, localhost e 127.0.0.1 na porta 3000 são permitidos por padrão. A tabela `users` mantém o e-mail em texto para identificação, mas nunca a senha; a tabela `user_sessions` mantém somente o hash dos tokens.
 
@@ -210,3 +210,30 @@ Consulte [o passo a passo do Railway](docs/RAILWAY.md) para configurar os três 
 - Nenhuma migração de dados é necessária: as medidas continuam armazenadas nos campos criptografados existentes. Publique primeiro o backend atualizado e depois o frontend.
 
 Os planos da landing permanecem em breve: 1 mês por R$ 14,90; 6 meses por R$ 79,90 (R$ 13,32/mês); 1 ano por R$ 129,90 (R$ 10,83/mês), com 27% off sobre 12 mensalidades de R$ 14,90. As equivalências mensais são arredondadas para centavos.
+
+## Isolamento por conta e recuperação dos registros antigos
+
+A migração `a82f30b4d9e1` adiciona `owner_id` a ingredientes, receitas e precificações. Novos registros recebem a conta da sessão; consultas, alterações, exclusões, arquivamento, duplicação e PDFs verificam essa conta. Usar o ID de outra conta retorna 404. Uma receita não aceita ingredientes de outra conta. Respostas da API usam `Cache-Control: private, no-store`.
+
+**Registros anteriores não tinham autor registrado. A migração não tenta adivinhar o dono:** mantém os dados e deixa `owner_id = NULL`; eles não aparecem nem podem ser acessados pela API. Não associe tudo ao primeiro usuário ou à primeira pessoa que entrar. Depois de publicar o backend, recarregue o app para descartar a lista antiga que possa estar na memória do navegador.
+
+Para recuperar registros, um administrador com acesso ao banco precisa revisar o conteúdo, a conta destinatária e os vínculos. A criptografia não permite inferir o criador. O comando abaixo só aceita IDs explicitamente selecionados e valida que os vínculos não cruzem contas. Não há endpoint público para reivindicar ou transferir registros.
+
+Crie um JSON de revisão (sem incluir chaves ou senhas):
+
+```json
+{
+  "ingredients": ["UUID-DO-INGREDIENTE"],
+  "recipes": ["UUID-DA-RECEITA"],
+  "simulations": ["UUID-DO-HISTORICO"]
+}
+```
+
+Na pasta backend (ou dentro de seu container), valide antes de aplicar:
+
+```sh
+python -m app.assign_legacy pessoa@exemplo.com revisao.json
+python -m app.assign_legacy pessoa@exemplo.com revisao.json --apply
+```
+
+Sem `--apply`, nada é alterado. A aplicação é transacional; IDs inexistentes, registros de outra conta e vínculos inconsistentes impedem a atribuição. Ingredientes legados e suas receitas vinculadas precisam ser revisados juntos. Históricos sem receita vinculada exigem revisão explícita de todo o snapshot pelo administrador. Se um ingrediente legado foi reutilizado por pessoas diferentes, revise e separe os dados antes da atribuição; o comando não duplica nem distribui automaticamente esse conteúdo. O acesso ao banco é administrativo e não é limitado pela sessão de um usuário comum.

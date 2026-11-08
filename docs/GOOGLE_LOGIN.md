@@ -1,6 +1,6 @@
 # Login com Google no pricit
 
-As telas `/login` e `/cadastro` estão prontas. **OAuth e isolamento de dados por usuário ainda não estão implementados.** O acesso por e-mail e senha já possui sessões revogáveis e proteção da API; as contas são criadas pelo administrador e compartilham o mesmo negócio (consulte o README). Configurar o Google Cloud, sozinho, não ativa os botões atuais. As duas telas deverão usar o mesmo fluxo: um novo `sub` do Google cria uma conta; um `sub` existente abre a conta correspondente.
+As telas `/login` e `/cadastro` estão prontas. **OAuth ainda não está implementado. O isolamento por conta já está ativo.** O acesso por e-mail e senha já possui sessões revogáveis e proteção da API; as contas são criadas pelo administrador e possuem dados isolados (consulte o README). Configurar o Google Cloud, sozinho, não ativa os botões atuais. As duas telas deverão usar o mesmo fluxo: um novo `sub` do Google cria uma conta; um `sub` existente abre a conta correspondente.
 
 ## 1. Configurar o Google
 
@@ -27,7 +27,7 @@ Use uma biblioteca OIDC mantida, com descoberta em `https://accounts.google.com/
 - Criar ou recuperar o usuário. Persistir nome/e-mail criptografados usando a camada de campos criptografados; nunca gravar tokens ou credenciais nos logs. Não guardar tokens de acesso/refresh se não houver necessidade de acessar APIs do Google.
 - Criar uma sessão opaca e revogável no servidor; cookie `HttpOnly`, `SameSite=Lax`, `Secure` em HTTPS, expiração e renovação controladas. Não guardar o ID token no localStorage. Logout invalida a sessão no servidor.
 - Trocar o aviso atual dos botões por navegação para `/api/v1/auth/google/start`.
-- Proteger **todas** as rotas da API, PDFs e `/app`, com verificação de sessão no servidor. Adicionar `owner_id` a ingredientes, receitas e simulações; validar também o proprietário de todos os vínculos entre esses objetos. Testar que um usuário não lê nem modifica dados de outro.
+- Reutilizar a proteção já implementada em todas as rotas da API, PDFs e `/app`: `owner_id` em ingredientes, receitas e simulações e validação de propriedade dos vínculos. Preservar os testes que impedem uma conta de ler ou modificar os dados de outra.
 - Definir explicitamente o proprietário dos registros locais já existentes; nunca distribuí-los automaticamente a qualquer novo usuário.
 - Proteger operações de escrita contra CSRF, restringir CORS, limitar tentativas e usar HTTPS na hospedagem.
 

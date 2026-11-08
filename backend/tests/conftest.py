@@ -7,6 +7,7 @@ from app.database import engine, get_db
 from app.main import app
 from app.auth import current_user
 from app.login_limit import LoginLimiter
+from app.models import User
 
 @pytest.fixture
 def client(request, monkeypatch):
@@ -15,7 +16,10 @@ def client(request, monkeypatch):
         transaction = connection.begin()
         with Session(bind=connection, join_transaction_mode='create_savepoint', expire_on_commit=False) as session:
             if not request.node.get_closest_marker('auth'):
-                app.dependency_overrides[current_user] = lambda: object()
+                user = User(email='domain-test@example.test', password_hash='unused-in-domain-tests')
+                session.add(user)
+                session.flush()
+                app.dependency_overrides[current_user] = lambda: user
             app.dependency_overrides[get_db] = lambda: session
             with TestClient(app) as client:
                 yield client

@@ -84,7 +84,7 @@ Dentro do container:
 python -m app.create_user seu@email.com
 ```
 
-Informe e confirme uma senha de ao menos 12 caracteres; entre em `https://DOMINIO/login`. Teste login, cadastro de ingrediente e logout. Os usuários compartilham o mesmo negócio; Google permanece indisponível.
+Informe e confirme uma senha de ao menos 12 caracteres; entre em `https://DOMINIO/login`. Teste login, cadastro de ingrediente e logout. Cada usuário possui seus próprios ingredientes, receitas e históricos; Google permanece indisponível.
 
 ## Diagnóstico
 
@@ -95,3 +95,7 @@ Informe e confirme uma senha de ao menos 12 caracteres; entre em `https://DOMINI
 - HTTP 403 no login: confira `CORS_ORIGINS` com a origem HTTPS exata usada no navegador.
 
 Referências: https://docs.railway.com/deployments/monorepo, https://docs.railway.com/builds/dockerfiles, https://docs.railway.com/networking/private-networking, https://docs.railway.com/cli/ssh.
+
+## Atualização do isolamento por conta
+
+Publique o backend com a migração `a82f30b4d9e1`. Cada nova gravação usa a conta autenticada. Os registros antigos sem autor ficam preservados e ocultos, sem atribuição automática. Confira a seção de recuperação no README antes de associar qualquer registro antigo a uma pessoa. Recarregue o frontend após o deploy para remover dados antigos já carregados na memória do navegador.

@@ -1,4 +1,4 @@
-"""Password authentication for the shared local workspace."""
+"""Password authentication with revocable sessions."""
 import hashlib
 import hmac
 import os

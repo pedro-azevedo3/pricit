@@ -13,7 +13,11 @@ class Identity:
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
-class Ingredient(Identity, Base):
+class Owned:
+    # Null is reserved for pre-isolation records awaiting an explicit admin review.
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('users.id', ondelete='RESTRICT'), nullable=True, index=True)
+
+class Ingredient(Owned, Identity, Base):
     __tablename__ = 'ingredients'
     name = mapped_column(encrypted('ingredients', 'name'), nullable=False)
     measurement_unit = mapped_column(encrypted('ingredients', 'measurement_unit'), nullable=False)
@@ -22,7 +26,7 @@ class Ingredient(Identity, Base):
     is_active = mapped_column(encrypted('ingredients', 'is_active'), nullable=False, default=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
 
-class Recipe(Identity, Base):
+class Recipe(Owned, Identity, Base):
     __tablename__ = 'recipes'
     name = mapped_column(encrypted('recipes', 'name'), nullable=False)
     description = mapped_column(encrypted('recipes', 'description'), nullable=True)
@@ -46,7 +50,7 @@ class RecipeIngredient(Identity, Base):
     measurement_unit = mapped_column(encrypted('recipe_ingredients', 'measurement_unit'), nullable=False)
     ingredient: Mapped[Ingredient] = relationship(lazy='joined')
 
-class RevenueSimulation(Identity, Base):
+class RevenueSimulation(Owned, Identity, Base):
     __tablename__ = 'revenue_simulations'
     recipe_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('recipes.id', ondelete='SET NULL'), nullable=True)
     quantity_sold = mapped_column(encrypted('revenue_simulations', 'quantity_sold'), nullable=False)
