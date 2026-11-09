@@ -20,6 +20,16 @@ test('landing apresenta o produto, calcula o preço e abre o cadastro', async ({
   await page.getByLabel('Acréscimo sobre o custo (markup)').fill('60');
   await page.getByText('Markup e margem de lucro são a mesma coisa?', { exact: true }).click();
   await expect(page.getByText('Não. Markup é o acréscimo', { exact: false })).toBeVisible();
+  const guide = page.getByRole('region', { name: 'Aprenda a dar valor ao seu trabalho.' });
+  await guide.scrollIntoViewIfNeeded();
+  await expect(guide.getByText('GUIA DE PRECIFICAÇÃO · DENTRO DA PLATAFORMA')).toBeVisible();
+  await expect(guide.getByText('R$ 20,00', {exact:true})).toBeVisible();
+  await expect(guide.getByText('R$ 30,00', {exact:true})).toBeVisible();
+  await expect(guide.getByText('R$ 2,50', {exact:true})).toBeVisible();
+  await expect(guide.getByRole('link', {name:'Conhecer o Guia'})).toHaveAttribute('href','/cadastro');
+  await page.getByText('O pricit me ajuda a definir o valor da minha hora?', {exact:true}).click();
+  await expect(page.getByText('Sim. A aba Guia tem orientações', {exact:false})).toBeVisible();
+  await guide.screenshot({path:`test-results/landing-guide-${testInfo.project.name}.png`,animations:'disabled'});
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: `test-results/landing-${testInfo.project.name}-light.png`, fullPage: true, animations: 'disabled' });

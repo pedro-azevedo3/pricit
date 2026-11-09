@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Decimal from 'decimal.js';
-import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, Menu, X, MoveUpRight } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, Menu, X, MoveUpRight, GraduationCap, Clock3 } from 'lucide-react';
 import { Mascot } from './mascot';
 import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
@@ -23,6 +23,7 @@ const questions = [
   ['Para quem é o pricit?', 'Para quem produz alimentos e quer entender seus custos: confeiteiros, pequenos produtores e negócios que trabalham com receitas. Você cadastra os ingredientes, monta as receitas e planeja suas vendas.'],
   ['O que entra no cálculo do preço?', 'Ingredientes, embalagens, despesas operacionais e mão de obra. Sobre o custo, você define um percentual de acréscimo (markup) para chegar ao preço sugerido. Também pode informar o preço que já pratica.'],
   ['Markup e margem de lucro são a mesma coisa?', 'Não. Markup é o acréscimo sobre o custo. Margem é a parcela do preço de venda que corresponde ao lucro. Por exemplo: custo de R$ 5,00 com markup de 100% resulta em preço de R$ 10,00 e margem de 50%.'],
+  ['O pricit me ajuda a definir o valor da minha hora?', 'Sim. A aba Guia tem orientações e calculadoras para estudar o valor da sua hora, a mão de obra por lote e por unidade e a diferença entre markup e margem. Você também compara hipóteses de preço e volume vendido antes de definir os valores em Receitas. Os estudos não alteram seus cadastros e não preveem a demanda.'],
   ['Posso exportar minhas receitas?', 'Sim. O sistema exporta PDFs das receitas salvas e das simulações, com os custos e os resultados para consulta.'],
   ['Funciona no celular?', 'Sim. A interface se adapta ao celular, tablet e computador.'],
 ];
@@ -60,7 +61,7 @@ export function LandingPage() {
           <h1>Sua receita é boa.<br/>Seu preço também<br/>precisa <span>ser.</span><svg viewBox="0 0 100 30" aria-hidden="true"><path d="M4 17 Q43 0 91 13 M74 3 L94 13 L78 26"/></svg></h1>
           <p>Você coloca talento na receita.<br className={styles.desktopBreak}/> A gente coloca clareza no preço. Conheça seus custos e descubra quanto cobrar pelo que você faz.</p>
           <div className={styles.heroActions}><Link href="/cadastro" className={styles.primary}>Bora precificar <ArrowUpRight size={20}/></Link><a href="#simulador" className={styles.textLink}>Ver na prática <ArrowRight size={17}/></a></div>
-          <div className={styles.heroNote}><Check size={15}/> Ingredientes, receitas e vendas em um só lugar.</div>
+          <div className={styles.heroNote}><Check size={15}/> Ingredientes, receitas, vendas e estudos em um só lugar.</div>
         </div>
         <div data-reveal="zoom" className={styles.heroArt}>
           <div className={styles.orbit}/><div className={styles.artLabel}>SEU TALENTO TEM VALOR.</div>
@@ -99,6 +100,28 @@ export function LandingPage() {
           <div className={styles.pdfBadge}><FileDown size={23}/><span>Sua receita organizada.<br/><strong>Também em PDF.</strong></span></div>
         </div>
         <div data-reveal="right" className={styles.organizeCopy}><span className={styles.eyebrow}>MAIS ORGANIZAÇÃO. MENOS IMPROVISO.</span><h2>Seu negócio merece<br/>mais que uma<br/>conta de cabeça.</h2><p>Consulte seus ingredientes, ajuste suas receitas e revisite as simulações salvas. Os números ficam organizados para você focar na próxima fornada.</p><ul><li><Check/> Custos das receitas atualizados com os ingredientes</li><li><Check/> Comparação entre custo proporcional e lotes completos</li><li><Check/> Receitas e simulações exportadas em PDF</li></ul><Link href="/cadastro" className={styles.textLink}>Conhecer o sistema <ArrowRight size={18}/></Link></div>
+      </section>
+      <section id="guia" className={`${styles.section} ${styles.container} ${styles.guideSection}`} aria-labelledby="guide-title">
+        <div data-reveal="left" className={styles.organizeCopy}>
+          <span className={styles.eyebrow}>GUIA DE PRECIFICAÇÃO · DENTRO DA PLATAFORMA</span>
+          <h2 id="guide-title">Aprenda a dar valor <br/>ao seu trabalho.</h2>
+          <p>Além de fazer as contas, o pricit ajuda você a entendê-las. Na aba Guia, encontre orientações, exemplos editáveis e calculadoras para montar suas métricas em Receitas com mais confiança.</p>
+          <ul>
+            <li><Clock3/><span><strong>Quanto vale sua hora?</strong> Estude sua remuneração e o tempo disponível para produzir.</span></li>
+            <li><BookOpen/><span><strong>Mão de obra na conta.</strong> Calcule o custo do seu trabalho por lote e por unidade.</span></li>
+            <li><ChartNoAxesCombined/><span><strong>Preço, lucro e vendas.</strong> Entenda markup e margem e compare diferentes hipóteses de volume vendido.</span></li>
+          </ul>
+          <p className={styles.guideNote}>Um ganho maior por unidade pode não compensar uma queda nas vendas. Compare cenários no Guia, sem alterar suas receitas nem tratar hipóteses como previsão de demanda.</p>
+          <Link href="/cadastro" className={styles.textLink}>Conhecer o Guia <ArrowRight size={18}/></Link>
+        </div>
+        <div data-reveal="right" className={styles.guideExample} aria-label="Exemplo ilustrativo de cálculo de mão de obra no Guia">
+          <div className={styles.guideExampleHeading}><GraduationCap size={25}/><span>Seu tempo também entra na receita.</span></div>
+          <span className={styles.eyebrow}>EXEMPLO DE ESTUDO</span>
+          <dl className={styles.guideInputs}><div><dt>Remuneração mensal pelo trabalho</dt><dd>R$ 2.400,00</dd></div><div><dt>Tempo produtivo no mês</dt><dd>120 horas</dd></div></dl>
+          <div className={styles.guideHourly}><span>Valor da hora</span><strong>R$ 20,00</strong><small>R$ 2.400,00 ÷ 120 horas</small></div>
+          <dl className={styles.guideResults}><div><dt>Lote com 90 minutos de trabalho</dt><dd>R$ 30,00</dd></div><div><dt>Mão de obra por unidade, rendendo 12</dt><dd>R$ 2,50</dd></div></dl>
+          <p>Na plataforma, use os exemplos ou preencha seus próprios valores. O Guia ajuda a entender a conta; você decide o que aplicar em cada receita.</p>
+        </div>
       </section>
       <section id="precos" className={styles.pricing} aria-labelledby="pricing-title" aria-describedby="pricing-status">
         <div className={styles.container}>
