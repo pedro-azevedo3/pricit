@@ -6,6 +6,7 @@ import { perBaseUnit } from '@/lib/calculations';
 import { AppSidebar } from './app-sidebar';
 import { AppTopbar } from './app-topbar';
 import { Ingredients } from './ingredients';
+import { PricingGuide } from './pricing-guide';
 import styles from './application-preview.module.css';
 
 // Public examples only. This preview never loads a session or customer records.
@@ -25,13 +26,17 @@ const demoIngredients = [
 const noop = () => {};
 const noChange = async () => {};
 
-export function ApplicationPreview() {
+export type PreviewTab = 'ingredients' | 'guide';
+
+export function ApplicationPreview({ tab = 'ingredients' }: { tab?: PreviewTab }) {
   return <div className={styles.frame} inert aria-hidden="true" data-application-preview>
     <div className={styles.canvas}>
-      <AppSidebar activeTab="ingredients" onNavigate={noop} onHelp={noop} preview/>
+      <AppSidebar activeTab={tab} onNavigate={noop} onHelp={noop} preview/>
       <div className={styles.workspace}>
-        <AppTopbar activeTab="ingredients" preview/>
-        <div className="px-10 pb-12 pt-10"><Ingredients items={demoIngredients} onChange={noChange} notify={noop}/></div>
+        <AppTopbar activeTab={tab} preview/>
+        <div key={tab} className="page-transition px-10 pb-12 pt-10">{tab === 'guide'
+          ? <PricingGuide onRecipes={noop}/>
+          : <Ingredients items={demoIngredients} onChange={noChange} notify={noop}/>}</div>
       </div>
     </div>
   </div>;

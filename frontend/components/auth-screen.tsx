@@ -4,7 +4,7 @@ import { type FormEvent, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, ArrowUpRight, Check, Info, Leaf, ArrowRight } from 'lucide-react';
-import { ApplicationPreview } from './application-preview';
+import { ApplicationPreview, type PreviewTab } from './application-preview';
 import { api } from '@/lib/api';
 import styles from './auth-screen.module.css';
 
@@ -13,13 +13,19 @@ function GoogleMark() {
 }
 
 function ProductPreview({ register }: { register: boolean }) {
+  const [tab, setTab] = useState<PreviewTab>('ingredients');
+  const guide = tab === 'guide';
   return <aside className={styles.previewPanel} aria-label="Conheça o pricit">
-    <div className={styles.previewWindow} role="img" aria-label="Prévia da biblioteca de ingredientes do pricit com dados de exemplo">
-      <ApplicationPreview/>
+    <div id="auth-product-preview" className={styles.previewWindow} role="img" aria-label={guide ? 'Prévia do Guia de precificação do pricit: hora de trabalho, mão de obra e lucro' : 'Prévia da biblioteca de ingredientes do pricit com dados de exemplo'}>
+      <ApplicationPreview tab={tab}/>
     </div>
     <span className={styles.exampleLabel}>DADOS DE EXEMPLO</span>
     <div className={styles.mascotSticker}><Image src={register ? '/mascot-happy.png' : '/mascot-cool.png'} alt={register ? 'Mascote do pricit sorrindo para dar boas-vindas' : 'Mascote do pricit de óculos escuros fazendo sinal de tudo certo'} width={150} height={150} sizes="150px" priority/></div>
-    <div className={styles.previewCaption}><span className={styles.captionEyebrow}>MENOS ACHISMO. MAIS PRICIT.</span><h2>{register ? <><em>Seu talento tem valor.</em><br/>Vamos colocar na conta?</> : <><em>Do ingrediente ao lucro,</em><br/>tudo faz mais sentido.</>}</h2><p>Ingredientes, receitas e preços organizados para o seu negócio.</p><span className={styles.captionLine} aria-hidden="true"/></div>
+    <div className={styles.previewCaption} aria-live="polite" aria-atomic="true"><span className={styles.captionEyebrow}>{guide ? 'APRENDA. CALCULE. APLIQUE.' : 'MENOS ACHISMO. MAIS PRICIT.'}</span><h2>{guide ? <><em>Seu tempo tem valor.</em><br/>Aprenda a colocar no preço.</> : register ? <><em>Seu talento tem valor.</em><br/>Vamos colocar na conta?</> : <><em>Do ingrediente ao lucro,</em><br/>tudo faz mais sentido.</>}</h2><p>{guide ? 'Calcule sua hora e a mão de obra. Compare preço, lucro e volume de vendas no Guia.' : 'Organize ingredientes e receitas, planeje preços e aprenda com o Guia de precificação.'}</p></div>
+    <div className={styles.previewControls} role="group" aria-label="Escolher prévia do sistema">
+      <button type="button" aria-pressed={!guide} aria-controls="auth-product-preview" onClick={() => setTab('ingredients')}>Ver ingredientes</button>
+      <button type="button" aria-pressed={guide} aria-controls="auth-product-preview" onClick={() => setTab('guide')}>Ver Guia de precificação</button>
+    </div>
   </aside>;
 }
 
@@ -47,7 +53,7 @@ export function AuthScreen({ mode }: { mode: 'login' | 'register' }) {
       <div className={styles.formContent}>
         <Link href="/" className={styles.logo} aria-label="pricit — início"><Image src="/pricit-logo-dark-green.png" alt="pricit" width={112} height={49} priority/></Link>
         <h1 id="auth-title">{register ? <>Seu negócio.<br/>Um novo começo.</> : <>Entre e fique à vontade.</>}</h1>
-        <p className={styles.description}>{register ? 'Dê o primeiro passo para organizar suas receitas e precificar com mais confiança.' : 'Seu próximo passo começa aqui. Entre para continuar cuidando do seu negócio.'}</p>
+        <p className={styles.description}>{register ? 'Organize suas receitas e aprenda a calcular sua hora, sua mão de obra e seus preços com mais confiança.' : 'Entre para cuidar das suas receitas, planejar seus preços e continuar aprendendo no Guia.'}</p>
         <button type="button" className={styles.googleButton} onClick={() => setUnavailable(true)} aria-describedby={unavailable ? 'google-status' : undefined}><GoogleMark/>{register ? 'Cadastrar-se com Google' : 'Entrar com Google'}</button>
         {unavailable && <div id="google-status" role="status" className={styles.notice}><Info size={17}/><p>O acesso com Google ainda não está disponível. Tente novamente mais tarde.</p></div>}
         <div className={styles.divider}><span/>{register ? 'Acesso por e-mail' : 'Ou entre com e-mail'}<span/></div>
@@ -60,7 +66,7 @@ export function AuthScreen({ mode }: { mode: 'login' | 'register' }) {
           <button className={styles.emailButton} disabled={busy} type="submit">{busy ? 'Entrando…' : 'Entrar com e-mail e senha'}<ArrowRight size={17}/></button>
         </form> : <div className={styles.registerAccess}>
           <span className={styles.registerIcon}><Leaf size={20}/></span><p>Para acesso por e-mail e senha, solicite uma conta ao administrador.</p>
-          <ul className={styles.benefits}><li><Check size={15}/> Seus ingredientes organizados</li><li><Check size={15}/> Todos os custos da receita na conta</li><li><Check size={15}/> Mais clareza para planejar suas vendas</li></ul>
+          <ul className={styles.benefits}><li><Check size={15}/> Seus ingredientes organizados</li><li><Check size={15}/> Todos os custos da receita na conta</li><li><Check size={15}/> Guia para calcular sua hora e mão de obra</li><li><Check size={15}/> Estudos de preço, lucro e volume de vendas</li></ul>
         </div>}
         <div className={styles.switchMode}>{register ? 'Já tem uma conta?' : 'Ainda não tem uma conta?'} <Link href={register ? '/login' : '/cadastro'}>{register ? 'Entrar' : 'Registre-se'}<ArrowUpRight size={14}/></Link></div>
         <p className={styles.formFooter}>Receita boa merece preço certo.</p>

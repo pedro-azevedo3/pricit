@@ -33,17 +33,21 @@
 .benefits { display: grid; gap: 14px; list-style: none; margin: 20px 0 0; padding: 0; }
 .benefits li { display: flex; align-items: center; gap: 9px; font-size: 11px; color: #597067; }
 .benefits svg { color: #58884c; flex-shrink: 0; }
-.previewPanel { position: relative; min-height: 820px; border-radius: 32px; background: #f3f6f8; overflow: hidden; }
+.previewPanel { position: relative; min-height: 880px; border-radius: 32px; background: #f3f6f8; overflow: hidden; }
 .previewWindow { position: absolute; left: 20px; top: 20px; width: calc(100% + 105px); min-width: 770px; height: 650px; background: #fff; border: 1px solid #edf1f3; border-radius: 26px; overflow: hidden; box-shadow: 0 12px 40px #28474605; }
 .previewWindow::after { content: ''; position: absolute; inset: 430px 0 0; background: linear-gradient(transparent, #f3f6f8 90%); pointer-events: none; }
 .exampleLabel { position: absolute; top: 18px; right: 28px; border: 1px solid #dce3da; border-radius: 20px; padding: 6px 9px; background: #fff; color: #6c7d70; font-size: 7px; letter-spacing: 1px; pointer-events: none; }
-.previewCaption { position: absolute; left: 26px; right: 26px; bottom: 42px; text-align: center; }
+.previewCaption { position: absolute; left: 26px; right: 26px; bottom: 100px; text-align: center; }
 .captionEyebrow { display: block; color: #779289; font-size: 8px; letter-spacing: 1.8px; margin-bottom: 15px; }
 .previewCaption h2 { font-size: clamp(25px, 2.2vw, 34px); font-weight: 600; line-height: 1.18; letter-spacing: -1.2px; }
 .previewCaption em { font-style: normal; color: #68a43d; }
 .previewCaption p { font-size: 11px; color: #849590; margin-top: 15px; }
-.captionLine { display: block; width: 34px; height: 6px; background: #a9e77d; border-radius: 9px; margin: 32px auto 0; }
-.mascotSticker { position: absolute; right: 24px; bottom: 218px; width: 150px; transform: rotate(-9deg); }
+.previewControls { position: absolute; left: 20px; right: 20px; bottom: 25px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.previewControls button { min-height: 40px; padding: 9px 14px; border: 1px solid #d1ddd2; border-radius: 22px; background: #fff; color: #204743; font-size: 11px; cursor: pointer; transition: background-color 180ms ease, border-color 180ms ease; }
+.previewControls button[aria-pressed="true"] { background: #c1ff72; border-color: #a9d96e; }
+.previewControls button:hover { border-color: #58834f; }
+.previewControls button:focus-visible { outline: 2px solid #58834f; outline-offset: 3px; }
+.mascotSticker { position: absolute; right: 24px; bottom: 276px; width: 150px; transform: rotate(-9deg); }
 .mascotSticker img { width: 100%; height: auto; filter: drop-shadow(0 10px 10px #26483312); transform-origin: 50% 85%; }
 .googleButton, .emailButton, .back svg, .switchMode svg { transition: transform 220ms ease, background-color 220ms ease, box-shadow 220ms ease; }
 @media (prefers-reduced-motion: no-preference) {
@@ -84,14 +88,15 @@
   .description { font-size: 12px; }
   .googleButton { margin-top: 27px; }
   .divider { margin-block: 25px; }
-  .previewPanel { min-height: 250px; margin: 0 14px 14px; border-radius: 24px; }
+  .previewPanel { min-height: 330px; margin: 0 14px 14px; border-radius: 24px; }
   .previewWindow { display: none; }
   .previewCaption { left: 23px; right: 126px; top: 33px; bottom: auto; text-align: left; }
   .captionEyebrow { font-size: 6px; letter-spacing: 1px; margin-bottom: 13px; }
   .previewCaption h2 { font-size: 23px; letter-spacing: -.8px; }
   .previewCaption p { font-size: 9px; line-height: 1.7; margin-top: 12px; }
-  .captionLine { margin: 16px 0 0; height: 4px; width: 26px; }
-  .mascotSticker { right: -4px; bottom: 40px; width: 139px; }
+  .previewControls { left: 14px; right: 14px; bottom: 20px; }
+  .previewControls button { padding-inline: 12px; font-size: 10px; }
+  .mascotSticker { right: -4px; bottom: 85px; width: 139px; }
 }
-@media (max-width: 360px) { .previewPanel { min-height: 275px; }.formPanel { padding-inline: 22px; }.formContent h1 { font-size: 27px; }.previewCaption { right: 112px; }.previewCaption h2 { font-size: 21px; }.mascotSticker { width: 122px; } }
+@media (max-width: 360px) { .previewPanel { min-height: 365px; }.formPanel { padding-inline: 22px; }.formContent h1 { font-size: 27px; }.previewCaption { right: 112px; }.previewCaption h2 { font-size: 21px; }.mascotSticker { width: 122px; } }
 @media (prefers-reduced-motion: reduce) { .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; } }

@@ -106,7 +106,7 @@ test('sessão válida permite acesso direto e sessão revogada bloqueia acesso',
 });
 
 
-test('prévia pública usa a biblioteca real com exemplos e não consulta dados privados',async({page})=>{
+test('prévias públicas mostram ingredientes e Guia reais sem consultar dados privados',async({page}, testInfo)=>{
   const calls:string[]=[];
   page.on('request',request=>{if(new URL(request.url()).pathname.startsWith('/api/v1/'))calls.push(request.url());});
   for(const route of ['/login','/cadastro']){
@@ -119,6 +119,20 @@ test('prévia pública usa a biblioteca real com exemplos e não consulta dados 
     await expect(preview.locator('tbody')).toContainText('Farinha de trigo');
     await expect(preview.locator('.brand-sidebar')).toHaveCount(1);
     await expect(page.getByRole('button',{name:/Ativar tema/})).toHaveCount(0);
+    const controls=page.getByRole('group',{name:'Escolher prévia do sistema'});
+    await controls.getByRole('button',{name:'Ver Guia de precificação'}).click();
+    await expect(controls.getByRole('button',{name:'Ver Guia de precificação'})).toHaveAttribute('aria-pressed','true');
+    await expect(preview.locator('h1')).toHaveText('Guia de precificação');
+    await expect(preview.locator('.brand-sidebar button[aria-current="page"]')).toHaveAttribute('aria-label','Guia');
+    await expect(preview.locator('#guide-labor')).toHaveCount(1);
+    await expect(preview.locator('#guide-sales')).toHaveCount(1);
+    await expect(page.getByRole('heading',{name:'Seu tempo tem valor. Aprenda a colocar no preço.'})).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+    await page.screenshot({path:`test-results/auth-guide-${testInfo.project.name}-${route.slice(1)}.png`,fullPage:true,animations:'disabled'});
+    await controls.getByRole('button',{name:'Ver ingredientes'}).focus();
+    await page.keyboard.press('Enter');
+    await expect(controls.getByRole('button',{name:'Ver ingredientes'})).toHaveAttribute('aria-pressed','true');
+    await expect(preview.locator('h1')).toHaveText('Biblioteca de ingredientes');
   }
   expect(calls).toEqual([]);
 });
