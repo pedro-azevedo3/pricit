@@ -147,15 +147,15 @@ test('campos novos começam vazios e a seleção compara preço e embalagem entr
 });
 
 
-test('tabela exibe custo por 100 g somente para ingredientes cadastrados em gramas',async({page,request},testInfo)=>{
+test('seletor alterna custo por 1 g, 50 g e 100 g sem alterar ml, unidades ou dados salvos',async({page,request},testInfo)=>{
   const suffix=`${testInfo.project.name}-${Date.now()}`;
   const ids:string[]=[];
   try {
     const cases=[
-      {unit:'g',quantity:'1000',price:'6',base:0.006,display:'R$ 0,60 / 100 g'},
-      {unit:'kg',quantity:'1',price:'20',base:0.02,display:'R$ 0,02 / g'},
-      {unit:'ml',quantity:'1000',price:'8',base:0.008,display:'R$ 0,01 / ml'},
-      {unit:'un',quantity:'12',price:'18',base:1.5,display:'R$ 1,50 / un'},
+      {unit:'g',quantity:'1000',price:'6',base:0.006,display:['R$ 0,01 / 1 g','R$ 0,30 / 50 g','R$ 0,60 / 100 g']},
+      {unit:'kg',quantity:'1',price:'20',base:0.02,display:['R$ 0,02 / 1 g','R$ 1,00 / 50 g','R$ 2,00 / 100 g']},
+      {unit:'ml',quantity:'1000',price:'8',base:0.008,display:['R$ 0,01 / ml','R$ 0,01 / ml','R$ 0,01 / ml']},
+      {unit:'un',quantity:'12',price:'18',base:1.5,display:['R$ 1,50 / un','R$ 1,50 / un','R$ 1,50 / un']},
     ];
     for(const item of cases){
       const response=await request.post('/api/v1/ingredients',{data:{name:`Medida ${item.unit} ${suffix}`,measurement_unit:item.unit,package_quantity:item.quantity,package_price:item.price}});
@@ -163,12 +163,30 @@ test('tabela exibe custo por 100 g somente para ingredientes cadastrados em gram
       const data=await response.json();ids.push(data.id);
       expect(Number(data.cost_per_base_unit)).toBe(item.base);
     }
+    const writes:string[]=[];
+    page.on('request',r=>{if(r.url().includes('/api/')&&['POST','PUT','PATCH','DELETE'].includes(r.method()))writes.push(r.url());});
     await page.goto('/app');
-    for(const item of cases){
-      const row=page.getByRole('row').filter({hasText:`Medida ${item.unit} ${suffix}`});
-      await expect(row.getByRole('cell').nth(3)).toContainText(item.display);
-      if(item.unit!=='g') await expect(row).not.toContainText('/ 100 g');
+    const selector=page.getByRole('combobox',{name:'Custo por medida de massa'});
+    await expect(selector).toHaveValue('100');
+    for(const grams of ['100','1','50']){
+      await selector.selectOption(grams);
+      for(const item of cases){
+        const row=page.getByRole('row').filter({hasText:`Medida ${item.unit} ${suffix}`});
+        await expect(row.getByRole('cell').nth(3)).toContainText(item.display[['1','50','100'].indexOf(grams)]);
+        if(['g','kg'].includes(item.unit)) await expect(row.getByRole('cell').nth(3)).toContainText(`R$ ${item.unit==='g'?'6,00':'20,00'} / kg`);
+      }
     }
+    await page.screenshot({path:`test-results/ingredient-cost-measure-${testInfo.project.name}.png`,fullPage:true,animations:'disabled'});
+    await page.getByRole('textbox',{name:'Pesquisar ingredientes'}).fill(`Medida g ${suffix}`);
+    await expect(page.getByRole('row').filter({hasText:`Medida g ${suffix}`})).toContainText('R$ 0,30 / 50 g');
+    expect(writes).toEqual([]);
+    const stored:Ingredient[]=await (await request.get('/api/v1/ingredients')).json();
+    for(let index=0;index<cases.length;index++){
+      const saved=stored.find(i=>i.id===ids[index])!;
+      expect(Number(saved.cost_per_base_unit)).toBe(cases[index].base);
+      expect(Number(saved.package_price)).toBe(Number(cases[index].price));
+    }
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
   } finally {
     for(const id of ids) await request.delete('/api/v1/ingredients/'+id);
   }

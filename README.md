@@ -32,7 +32,7 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 
 ## Fluxo de uso
 
-1. Em **Ingredientes**, informe o nome, a quantidade em g, kg, ml ou unidade e o valor da embalagem. Consulte o custo por grama, mililitro ou unidade (e por quilograma para ingredientes de massa). Pesquise, ordene, edite e arquive pelo menu da tabela.
+1. Em **Ingredientes**, informe o nome, a quantidade em g, kg, ml ou unidade e o valor da embalagem. Na tabela, escolha exibir o custo por 1 g, 50 g ou 100 g para ingredientes em g ou kg (padrão: 100 g). Mililitros e unidades mantêm suas medidas; o custo por quilograma continua disponível. O seletor altera somente a apresentação, preservando a precisão dos cálculos das receitas. Pesquise, ordene, edite e arquive pelo menu da tabela.
 2. Em **Receitas**, cadastre o rendimento, o tempo de produção e os ingredientes. Acrescente embalagens, despesas operacionais e mão de obra. Os resultados aparecem imediatamente.
 3. Defina o lucro desejado sobre custo (markup). O preço praticado é independente do sugerido; deixá-lo vazio faz o sistema utilizar o sugerido.
 4. Salve e reabra a receita. Exporte o PDF da versão salva ou abra **Precificar vendas**.
