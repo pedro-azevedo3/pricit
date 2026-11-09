@@ -37,6 +37,7 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 3. Defina o lucro desejado sobre custo (markup). O preço praticado é independente do sugerido; deixá-lo vazio faz o sistema utilizar o sugerido.
 4. Salve e reabra a receita. Exporte o PDF da versão salva ou abra **Precificar vendas**.
 5. Compare custo proporcional com lotes completos. Salve a simulação para exportar o PDF e consultar seus valores históricos.
+6. Em **Guia**, estude o valor da sua hora e a mão de obra por lote/unidade. Compare hipóteses de preço e volume vendido, entenda a diferença entre markup e margem e consulte as orientações para preencher **Receitas**. Os campos começam vazios; os exemplos são opcionais. Os estudos não são salvos no banco nem transferidos automaticamente, permanecem ao alternar abas e são descartados ao recarregar ou sair do app.
 
 ## Stack e organização
 
