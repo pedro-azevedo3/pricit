@@ -33,7 +33,7 @@ function ProductPreview({ register, profile }: { register: boolean; profile: Bus
   </aside>;
 }
 
-export function AuthScreen({ mode }: { mode: 'login' | 'register' }) {
+export function AuthScreen({ mode, initialBusinessType = '' as BusinessType }: { mode: 'login' | 'register'; initialBusinessType?: BusinessType }) {
   const register = mode === 'register';
   const [unavailable, setUnavailable] = useState(false);
   const [email, setEmail] = useState('');
@@ -41,7 +41,7 @@ export function AuthScreen({ mode }: { mode: 'login' | 'register' }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
-  const [profile, setProfile] = useState<BusinessProfile>({business_name:'',business_type:'' as BusinessType,pricing_goal:'' as PricingGoal});
+  const [profile, setProfile] = useState<BusinessProfile>({business_name:'',business_type:initialBusinessType,pricing_goal:'' as PricingGoal});
   const [confirmation, setConfirmation] = useState('');
   async function signup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError('');

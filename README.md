@@ -284,3 +284,7 @@ python -m app.assign_legacy pessoa@exemplo.com revisao.json --apply
 Sem `--apply`, nada é alterado. A aplicação é transacional; IDs inexistentes, registros de outra conta e vínculos inconsistentes impedem a atribuição. Ingredientes legados e suas receitas vinculadas precisam ser revisados juntos. Históricos sem receita vinculada exigem revisão explícita de todo o snapshot pelo administrador. Se um ingrediente legado foi reutilizado por pessoas diferentes, revise e separe os dados antes da atribuição; o comando não duplica nem distribui automaticamente esse conteúdo. O acesso ao banco é administrativo e não é limitado pela sessão de um usuário comum.
 
 A prévia pública nas telas de login e cadastro reutiliza o menu, o cabeçalho e a biblioteca de ingredientes do app com exemplos fixos. Ela é inerte e não consulta sessões nem dados de clientes.
+
+### Páginas por público
+
+O menu público **Soluções** reúne Alimentação (página principal, compartilhada pelos segmentos alimentícios) e **Profissionais autônomos**, em `/solucoes/profissionais-autonomos`. Esta primeira página de serviços apresenta precificação por hora/projeto, materiais e despesas, Guia e documentos em PDF. A simulação é ilustrativa e não salva dados. Os botões de cadastro levam a `/cadastro?perfil=freelance`, que seleciona o segmento inicial sem impedir sua alteração no questionário; parâmetros desconhecidos são ignorados. O cabeçalho é compartilhado entre as páginas, com navegação por teclado e adaptação ao celular.

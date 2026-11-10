@@ -4,8 +4,9 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Decimal from 'decimal.js';
-import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, Menu, X, MoveUpRight, GraduationCap, Clock3 } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, MoveUpRight, GraduationCap, Clock3 } from 'lucide-react';
 import { Mascot } from './mascot';
+import { MarketingHeader } from './marketing-header';
 import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
 import { businessProfiles } from '@/lib/business';
@@ -35,7 +36,6 @@ const currency = (value: Decimal) => value.toNumber().toLocaleString('pt-BR', { 
 export function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
   useScrollReveal(root);
-  const [menu, setMenu] = useState(false);
   const [cost, setCost] = useState('4.50');
   const [markup, setMarkup] = useState('60');
   const valid = cost !== '' && Number.isFinite(Number(cost)) && Number(cost) >= 0 && Number(cost) <= 1000000;
@@ -44,19 +44,7 @@ export function LandingPage() {
   const price = base.plus(profit);
   return <div ref={root} className={styles.landing} data-public-page>
     <a href="#conteudo" className={styles.skip}>Pular para o conteúdo</a>
-    <header className={styles.header}>
-      <div className={styles.navbar}>
-        <Link href="/" aria-label="pricit — início" className={styles.logo}><Image src="/pricit-logo-dark-green.png" alt="pricit" width={112} height={49} priority /></Link>
-        <nav className={`${styles.navigation} ${menu ? styles.menuOpen : ''}`} aria-label="Navegação do site">
-          <a href="#como-funciona" onClick={() => setMenu(false)}>Como funciona</a>
-          <a href="#simulador" onClick={() => setMenu(false)}>Na prática</a>
-          <a href="#precos" onClick={() => setMenu(false)}>Preços</a>
-          <a href="#duvidas" onClick={() => setMenu(false)}>Dúvidas</a>
-          <Link href="/login" className={styles.mobileAccess}>Entrar <ArrowUpRight size={16}/></Link><Link href="/cadastro" className={styles.mobileAccess}>Registre-se <ArrowUpRight size={16}/></Link>
-        </nav>
-        <div className={styles.navActions}><Link href="/login" className={styles.loginLink}>Entrar</Link><Link href="/cadastro" className={styles.headerCta}>Registre-se <ArrowUpRight size={16}/></Link><button className={styles.menuButton} aria-label={menu ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button></div>
-      </div>
-    </header>
+    <MarketingHeader/>
     <main id="conteudo">
       <section className={`${styles.hero} ${styles.container}`}>
         <div data-reveal="left" className={styles.heroCopy}>

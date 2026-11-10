@@ -257,3 +257,5 @@
   75% { transform: translateY(-9px) rotate(calc(var(--mascot-angle) - 3deg)) scale(1.035); }
   100% { transform: rotate(var(--mascot-angle)) scale(1.035); }
 }
+@media (min-width: 761px) and (max-width: 1100px) { .navbar { gap: 16px; padding-inline: 12px; }.navigation { gap: 12px; }.navigation a { font-size: 11px; }.logo { padding-inline: 4px; }.logo img { width: 85px; }.headerCta { padding-inline: 12px; font-size: 11px; gap: 10px; } }
+@media (max-width: 760px) { .navigation.menuOpen { max-height: calc(100dvh - 100px); overflow-y: auto; } }
