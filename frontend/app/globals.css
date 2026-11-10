@@ -53,6 +53,9 @@
 .sidebar-help-collapsed { min-height: 48px; justify-content: center; padding-inline: 0; }
 .app-sidebar[data-collapsed="true"] .brand-logo { width: 48px; }
 .app-workspace { min-width: 0; transition: margin-left 220ms ease; }
+.app-mobile-nav { gap: 4px; padding-inline: 4px; }
+.app-mobile-nav button { font-size: 10px; padding-inline: 2px; }
+@media (max-width: 380px) { .app-mobile-nav button { font-size: 9px; } }
 @media (min-width: 1024px) {
   .app-workspace { margin-left: 234px; }
   [data-sidebar-collapsed="true"] > .app-workspace { margin-left: 80px; }

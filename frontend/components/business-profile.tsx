@@ -19,7 +19,7 @@ export function BusinessProfile({ onSaved }: { onSaved: (profile: Profile) => vo
   const selected = businessProfiles[draft.business_type];
   return <div className="max-w-3xl"><p className="eyebrow">Seu negócio, sua perspectiva</p><h1 className="mt-3 text-3xl font-semibold">Perfil do negócio</h1><p className="mt-4 text-sm leading-7 text-[var(--muted)]">Escolha seu segmento a qualquer momento. As telas e os novos cadastros se adaptam; seus dados e os formatos das fichas já salvas são preservados.</p>
     <form onSubmit={save} className="panel mt-7 space-y-6 p-5 sm:p-7"><BusinessFields value={draft} onChange={setDraft} disabled={busy}/>
-      <div className="notice"><strong>{selected.label}</strong><p>{selected.costs}</p><p className="mt-2">{selected.service ? 'Você verá Produtos e Serviços. Produtos consumidos são opcionais; energia e equipamentos podem ser detalhados por atendimento.' : `Você verá ${selected.resources} e ${selected.offers}. Detalhe sua composição, o rendimento por lote e os custos de estrutura.`}</p></div>
+      <div className="notice"><strong>{selected.label}</strong><p>{selected.costs}</p><p className="mt-2">{selected.service ? `Você verá ${selected.resources} e ${selected.offers}. Itens consumidos são opcionais; energia e equipamentos podem ser detalhados por ficha.` : `Você verá ${selected.resources} e ${selected.offers}. Detalhe sua composição, o rendimento por lote e os custos de estrutura.`}</p></div>
       <ErrorBox message={error}/><Button type="submit" disabled={busy}><Save size={16}/>{busy ? 'Salvando…' : 'Salvar perfil do negócio'}</Button>
     </form></div>;
 }

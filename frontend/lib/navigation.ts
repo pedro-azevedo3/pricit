@@ -1,4 +1,4 @@
-import { Leaf, BookOpen, ChartNoAxesCombined, GraduationCap, UserRound, Package, FileSignature } from 'lucide-react';
+import { Leaf, BookOpen, ChartNoAxesCombined, GraduationCap, Package, FileSignature } from 'lucide-react';
 import { businessProfiles, type BusinessType } from './business';
 import { businessOfferIcon } from './business-icons';
 
@@ -9,7 +9,6 @@ export const appTabs = [
   {id:'simulator' as AppTab,name:'Precificação',icon:ChartNoAxesCombined,description:'Planejamento de vendas'},
   {id:'guide' as AppTab,name:'Guia',icon:GraduationCap,description:'Hora, custos e lucro'},
   {id:'documents' as AppTab,name:'Documentos',icon:FileSignature,description:'Contratos e orçamentos'},
-  {id:'profile' as AppTab,name:'Perfil',icon:UserRound,description:'Seu tipo de negócio'},
 ];
 export function businessTabs(type: BusinessType) {
   const business = businessProfiles[type];

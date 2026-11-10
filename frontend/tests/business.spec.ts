@@ -22,8 +22,13 @@ test('perfil adapta segmentos e serviço funciona sem ingredientes, com históri
   try{
     await page.goto('/app');
     const nav=page.getByRole('navigation',{name:testInfo.project.name==='mobile'?'Navegação móvel':'Navegação principal'});
+    await expect(nav.getByRole('button',{name:'Perfil',exact:true})).toHaveCount(0);
+    const profileButton=page.getByRole('button',{name:'Perfil do negócio',exact:true});
+    await expect(profileButton).toBeVisible();
     for(const type of ['acai','burger','bakery','manicure','brows','craft','automotive','creative','freelance','beauty'] as const){
-      await nav.getByRole('button',{name:'Perfil',exact:true}).click();
+      await profileButton.click();
+      await expect(page.getByRole('heading',{name:'Perfil do negócio',exact:true})).toBeVisible();
+      await expect(profileButton).toHaveAttribute('aria-pressed','true');
       await page.getByLabel('Nome do negócio').fill('Negócio de teste');
       await page.getByLabel('Tipo de negócio').selectOption(type);
       await page.getByRole('button',{name:'Salvar perfil do negócio'}).click();
@@ -79,7 +84,7 @@ test('perfil adapta segmentos e serviço funciona sem ingredientes, com históri
     const simulations:Simulation[]=await (await request.get('/api/v1/simulations')).json();
     const snapshot=simulations.find(s=>s.recipe_id===recipeId)!;
     expect(Number(snapshot.results.production_cost)).toBe(162.5);
-    await nav.getByRole('button',{name:'Perfil',exact:true}).click();
+    await profileButton.click();
     await page.getByLabel('Tipo de negócio').selectOption('food');
     await page.getByRole('button',{name:'Salvar perfil do negócio'}).click();
     await expect(nav.getByRole('button',{name:'Receitas',exact:true})).toBeVisible();

@@ -41,7 +41,7 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 
 ## Segmentos e perfil do negócio
 
-A aba **Perfil** permite escolher **Culinária e confeitaria**, **Lojas de açaí e sorveterias**, **Barbearias e cabeleireiros**, **Hamburguerias**, **Padarias**, **Manicure**, **Designer de sobrancelhas**, **Artesãos**, **Estética automotiva**, **Fotógrafos e designers** ou **Freelancer**. O perfil é persistido na conta e carregado em qualquer dispositivo, sem usar preferências locais de outra pessoa. O nome do negócio é criptografado no banco.
+O ícone **Perfil do negócio**, no canto superior direito, abre uma tela dedicada para escolher **Culinária e confeitaria**, **Lojas de açaí e sorveterias**, **Barbearias e cabeleireiros**, **Hamburguerias**, **Padarias**, **Manicure**, **Designer de sobrancelhas**, **Artesãos**, **Estética automotiva**, **Fotógrafos e designers** ou **Freelancer**. O perfil é persistido na conta e carregado em qualquer dispositivo, sem usar preferências locais de outra pessoa. O nome do negócio é criptografado no banco.
 
 | Segmento | Biblioteca e fichas | Exemplos de custos |
 |---|---|---|
