@@ -63,6 +63,16 @@ Serviços podem ser salvos sem produtos consumidos; para um atendimento, use ren
 
 A migração `d51b7c6a203e` atribui `food` às contas existentes e `recipe` às fichas existentes, com custo adicional zero. **No Railway, publique primeiro o backend e depois o frontend**; o comando de inicialização do backend já executa `alembic upgrade head`. Não crie novas tabelas/colunas manualmente nem gere novas chaves. Consulte [o roteiro de atualização](docs/RAILWAY.md).
 
+## Listas de compras
+
+A aba **Compras** reúne listas privadas por conta. Em **Nova lista**, informe um nome, selecione os produtos/ingredientes/materiais ativos da biblioteca e defina a quantidade inteira de embalagens de cada item (1 a 1.000.000). O tamanho e a unidade da embalagem ficam visíveis, incluindo g, kg, ml e unidade. Itens duplicados são evitados; marcas diferentes continuam separadas pelos seus cadastros.
+
+A lista guarda nome, embalagem e preço de referência ao adicionar o item. Alterações posteriores de nome/preço, arquivamento ou exclusão na biblioteca não apagam nem modificam essa referência nas listas salvas. Itens arquivados não entram em novas listas; referências já salvas podem continuar sendo editadas. É possível remover itens, editar quantidades, marcar como comprado, salvar observações e excluir listas sem alterar os cadastros de origem.
+
+As estimativas multiplicam o preço de referência pela quantidade de embalagens; cada linha é arredondada normalmente para centavos e o total soma essas linhas. O valor pendente exclui os itens marcados como comprados. O PDF da versão salva inclui embalagem, quantidade, marcação de compra, valores estimados e observações. Não há movimentação automática de estoque nem atualização do preço da biblioteca ao marcar uma compra.
+
+A migração `f73d9e8c425a` cria `shopping_lists`, com proprietário obrigatório e payload criptografado. As rotas `/api/v1/shopping-lists`, incluindo PDF, exigem sessão e verificam a conta; o servidor só aceita novos itens pertencentes à biblioteca do usuário. Publique backend antes do frontend, mantendo `alembic upgrade head` na inicialização.
+
 ## Contratos e orçamentos
 
 Em **Documentos**, crie um orçamento ou contrato com título, dados do prestador/cliente, escopo, datas de início/término, pagamento e condições editáveis. Orçamentos exigem validade; contratos exigem condições. Os itens discriminam serviço/entrega, mão de obra, material, equipamento ou outro valor. Você pode copiar o preço de venda de uma ficha para o documento, editá-lo e aplicar um desconto. Os custos internos e o markup não são incluídos no PDF enviado ao cliente.

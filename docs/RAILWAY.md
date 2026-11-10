@@ -113,3 +113,7 @@ Valide cadastro com questionário, logout/login, persistência do perfil e a fic
 Publique o backend com `e62c8d7b314f` antes do frontend. O comando padrão aplica a migração automaticamente e cria a tabela privada `business_documents`; nenhuma chave nova ou variável adicional é necessária.
 
 Em **Perfil**, as seis categorias adicionais ficam disponíveis para contas existentes; novos cadastros também podem selecioná-las no questionário. Na aba **Documentos**, valide criação de orçamento, PDF, compartilhamento/download, conversão para novo contrato e edição. Cada conta enxerga somente seus próprios documentos. O compartilhamento é feito por arquivo, sem link público nem envio automático por e-mail/WhatsApp.
+
+## Atualização das listas de compras
+
+Publique primeiro o backend com a migração `f73d9e8c425a` e depois o frontend. A inicialização padrão cria a tabela privada `shopping_lists` automaticamente; não há novas variáveis ou chaves. Valide a aba **Compras**, selecionando itens da biblioteca, alterando a quantidade de embalagens, marcando um item como comprado e exportando o PDF. As listas preservam as referências salvas mesmo se o cadastro original for alterado ou excluído.

@@ -27,7 +27,7 @@ FIELDS = {
 LEGACY_FIELDS = FIELDS
 FIELDS = {**LEGACY_FIELDS, 'users': {'business_name': 'name'},
           'recipes': {**LEGACY_FIELDS['recipes'], 'additional_costs': 'json'},
-          'business_documents': {'payload': 'json'}}
+          'business_documents': {'payload': 'json'}, 'shopping_lists': {'payload': 'json'}}
 
 @lru_cache(maxsize=1)
 def keyring():

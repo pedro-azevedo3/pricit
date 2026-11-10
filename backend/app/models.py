@@ -86,3 +86,9 @@ class BusinessDocument(Owned, Identity, Base):
     owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id', ondelete='RESTRICT'), nullable=False, index=True)
     payload = mapped_column(encrypted('business_documents', 'payload'), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+class ShoppingList(Owned, Identity, Base):
+    __tablename__ = 'shopping_lists'
+    owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id', ondelete='RESTRICT'), nullable=False, index=True)
+    payload = mapped_column(encrypted('shopping_lists', 'payload'), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)

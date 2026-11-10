@@ -18,7 +18,7 @@ def child():
     config = Config('alembic.ini')
     command.upgrade(config, 'c28d1e9f040a')
     old_fingerprint = json.loads(subprocess.check_output([sys.executable, '-m', 'scripts.fingerprint']))
-    assert 'business_documents' not in old_fingerprint
+    assert {'business_documents','shopping_lists'}.isdisjoint(old_fingerprint)
     ids = {table: uuid.uuid4() for table in FIELDS}
     values = {}
     with engine.begin() as connection:
@@ -47,7 +47,7 @@ def child():
             values[table] = dict(connection.execute(text(f'SELECT * FROM "{table}"')).mappings().one())
     command.upgrade(config, 'head')
     new_fingerprint = json.loads(subprocess.check_output([sys.executable, '-m', 'scripts.fingerprint']))
-    assert 'business_documents' in new_fingerprint
+    assert {'business_documents','shopping_lists'}.issubset(new_fingerprint)
     with engine.begin() as connection:
         legacy_recipe = connection.execute(text('SELECT kind, additional_costs FROM recipes')).mappings().one()
         assert legacy_recipe['kind'] == 'recipe' and legacy_recipe['additional_costs'] is None
