@@ -4,13 +4,12 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Decimal from 'decimal.js';
-import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, MoveUpRight, GraduationCap, Clock3 } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, MoveUpRight, GraduationCap, Clock3, Utensils, BriefcaseBusiness } from 'lucide-react';
 import { Mascot } from './mascot';
 import { MarketingHeader } from './marketing-header';
 import { MarketingPricing } from './marketing-pricing';
 import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
-import { businessProfiles } from '@/lib/business';
 
 const features = [
   { icon: Leaf, number: '01', title: 'Tudo começa no ingrediente.', text: 'Cadastre o preço e a quantidade da embalagem. O custo por grama, mililitro ou unidade fica por nossa conta.', detail: 'Sua biblioteca, sempre à mão.' },
@@ -18,8 +17,8 @@ const features = [
   { icon: ChartNoAxesCombined, number: '03', title: 'Venda com os números na mão.', text: 'Simule quantidades, compare a produção em lotes e veja a diferença entre faturamento, custo e lucro.', detail: 'Mais clareza para decidir.' },
 ];
 const questions = [
-  ['Para quem é o pricit?', 'Para negócios de alimentação, beleza, artesanato, estética automotiva, fotografia, design e profissionais freelancers. O questionário de cadastro adapta a perspectiva ao seu segmento. Você pode trocar o perfil depois, preservando seus dados.'],
-  ['Como funciona para barbearias e salões?', 'Você cadastra produtos consumidos e monta fichas de serviços com tempo de atendimento, mão de obra, energia e uso de equipamentos. Produtos são opcionais quando o serviço depende só do trabalho e da estrutura. Os custos detalhados entram no preço sugerido, nas simulações e nos PDFs.'],
+  ['Para quem é o pricit?', 'Para negócios de alimentação e profissionais autônomos que querem entender seus custos e precificar com clareza. Conheça a página de cada solução pelo menu Soluções. O questionário adapta a perspectiva ao seu trabalho, e você pode trocar o perfil depois, preservando seus dados.'],
+  ['Também posso precificar serviços?', 'Sim. A solução para profissionais autônomos considera tempo de trabalho, materiais e despesas por serviço ou projeto. Acesse Profissionais autônomos no menu Soluções para conhecer essa perspectiva.'],
   ['O que entra no cálculo do preço?', 'Ingredientes, embalagens, despesas operacionais e mão de obra. Sobre o custo, você define um percentual de acréscimo (markup) para chegar ao preço sugerido. Também pode informar o preço que já pratica.'],
   ['Markup e margem de lucro são a mesma coisa?', 'Não. Markup é o acréscimo sobre o custo. Margem é a parcela do preço de venda que corresponde ao lucro. Por exemplo: custo de R$ 5,00 com markup de 100% resulta em preço de R$ 10,00 e margem de 50%.'],
   ['O pricit me ajuda a definir o valor da minha hora?', 'Sim. A aba Guia tem orientações e calculadoras para estudar o valor da sua hora, a mão de obra por lote e por unidade e a diferença entre markup e margem. Você também compara hipóteses de preço e volume vendido antes de definir os valores em Receitas. Os estudos não alteram seus cadastros e não preveem a demanda.'],
@@ -60,9 +59,11 @@ export function LandingPage() {
       </section>
       <div className={styles.benefitStrip}><div data-reveal="soft" className={styles.container}><span><Leaf size={18}/> Do ingrediente ao preço</span><Plus size={14} aria-hidden="true"/><span><BookOpen size={18}/> Cada custo no seu lugar</span><Plus size={14} aria-hidden="true"/><span><ChartNoAxesCombined size={18}/> Decisões com mais clareza</span></div></div>
       <section className={`${styles.section} ${styles.container}`} aria-labelledby="audience-title">
-        <div data-reveal="up" className={styles.sectionIntro}><div><span className={styles.eyebrow}>UMA PERSPECTIVA PARA CADA NEGÓCIO</span><h2 id="audience-title">Produtos ou serviços.<br/>Seu trabalho na conta.</h2></div><p>Responda ao questionário antes de criar sua conta. O sistema adapta as telas e os custos ao seu segmento; você pode mudar a perspectiva em Perfil a qualquer momento.</p></div>
-        <div className={styles.audiences}>{Object.entries(businessProfiles).map(([key,business],index)=><article key={key} data-reveal="up" data-reveal-offset={index*25}><h3>{business.label}</h3><p>{business.costs}</p><span>{business.resources} + {business.offers}</span></article>)}</div>
-        <Link href="/cadastro" className={styles.textLink}>Encontrar meu perfil <ArrowRight size={17}/></Link>
+        <div data-reveal="up" className={styles.sectionIntro}><div><span className={styles.eyebrow}>UMA PERSPECTIVA PARA O SEU NEGÓCIO</span><h2 id="audience-title">O que você faz tem valor.<br/>A gente ajuda na conta.</h2></div><p>Conheça a solução que considera os custos do seu trabalho, da produção de alimentos à prestação de serviços.</p></div>
+        <div className={styles.audiences}>
+          <article data-reveal="up"><span className={styles.audienceIcon}><Utensils size={25}/></span><h3>Negócios de alimentação</h3><p>Do ingrediente ao produto pronto: organize receitas, embalagens, mão de obra e despesas para precificar com mais clareza.</p><a href="#como-funciona" className={styles.textLink}>Conheça a solução para alimentação <ArrowRight size={17}/></a></article>
+          <article data-reveal="up" data-reveal-offset="35"><span className={styles.audienceIcon}><BriefcaseBusiness size={25}/></span><h3>É profissional autônomo?</h3><p>Seu tempo, materiais e despesas também entram na conta. Descubra uma perspectiva feita para precificar seus serviços e projetos.</p><Link href="/solucoes/profissionais-autonomos" className={styles.textLink}>Conheça as soluções para você <ArrowRight size={17}/></Link></article>
+        </div>
       </section>
       <section id="como-funciona" className={`${styles.section} ${styles.container}`}>
         <div data-reveal="up" className={styles.sectionIntro}><div><span className={styles.eyebrow}>SIMPLES DO COMEÇO AO LUCRO</span><h2>O seu próximo passo.<br/>Sem complicar a receita.</h2></div><p>Da primeira compra ao planejamento das vendas, o pricit organiza os números junto com você.</p></div>
