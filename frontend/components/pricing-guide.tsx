@@ -7,6 +7,7 @@ import { studyLabor, studySales, type LaborStudy, type SalesStudy } from '@/lib/
 import { Button } from './ui/button';
 import { Metric } from './shared';
 import styles from './pricing-guide.module.css';
+import { useBusiness } from './business-context';
 
 const emptyLabor: LaborStudy = { income: '', days: '', hours: '', minutes: '', yield: '' };
 const emptySales: SalesStudy = { cost: '', markupA: '', unitsA: '', markupB: '', unitsB: '' };
@@ -23,6 +24,8 @@ function StudyField({ label, value, onChange, example, min = 0, max = 1e6, step 
 }
 
 export function PricingGuide({ onRecipes }: { onRecipes: () => void }) {
+  const { business }=useBusiness();
+  const service=business.service;
   const [labor, setLabor] = useState(emptyLabor);
   const [sales, setSales] = useState(emptySales);
   const laborResult = studyLabor(labor), salesResult = studySales(sales);
@@ -36,41 +39,41 @@ export function PricingGuide({ onRecipes }: { onRecipes: () => void }) {
       <p className="eyebrow">Aprenda e aplique no seu negócio</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight">Guia de precificação</h1>
       <p className={styles.lead}>Seu tempo tem valor. Seu preço precisa fazer sentido.</p>
-      <p>Estude sua hora de trabalho, o custo da mão de obra e o equilíbrio entre lucro e vendas. Faça as contas aqui antes de definir os valores em Receitas.</p>
+      <p>Estude sua hora de trabalho, o custo da mão de obra e o equilíbrio entre lucro e vendas. Faça as contas aqui antes de definir os valores em {business.offers}.</p>
       <nav aria-label="Tópicos do guia" className={styles.topics}>
         <a href="#guide-labor"><Clock3 size={16}/>Hora e mão de obra</a>
         <a href="#guide-sales"><TrendingUp size={16}/>Lucro e vendas</a>
-        <a href="#guide-apply"><BookOpen size={16}/>Aplicar em Receitas</a>
+        <a href="#guide-apply"><BookOpen size={16}/>Aplicar em {business.offers}</a>
       </nav>
-      <p className="subtle">Área de estudos: estes cálculos ficam apenas nesta sessão da tela e não alteram seus cadastros.</p>
+      <p className="subtle">Segmento: {business.label}. Área de estudos: estes cálculos ficam apenas nesta sessão da tela e não alteram seus cadastros.</p>
     </header>
 
     <section id="guide-labor" className={`panel ${styles.lesson}`} aria-labelledby="guide-labor-title">
       <h2 id="guide-labor-title" className={styles.title}><span className="number-dot">1</span>Quanto vale a sua hora?</h2>
       <p>Comece pela remuneração mensal que deseja receber pelo seu trabalho. Divida pelas horas que consegue dedicar à produção no mês. Essa meta precisa ser compatível com sua capacidade de produção e com as vendas.</p>
       <div className={styles.formula}>Valor da hora = remuneração mensal ÷ horas produtivas no mês</div>
-      <p>Use uma agenda realista: reserve tempo para compras, atendimento e administração ao estimar as horas produtivas. Se essas atividades forem incluídas no tempo de cada receita, não as conte novamente em outro custo.</p>
+      <p>Use uma agenda realista: reserve tempo para compras, atendimento e administração ao estimar as horas produtivas. Se essas atividades forem incluídas no tempo de cada ficha, não as conte novamente em outro custo.</p>
 
       <div className={styles.exercise}>
-        <div className={styles.exerciseHeader}><h3>Calcule uma referência para sua mão de obra</h3><Button variant="outline" onClick={() => setLabor(laborExample)}>Usar exemplo de mão de obra</Button></div>
+        <div className={styles.exerciseHeader}><h3>Calcule uma referência para sua mão de obra</h3><Button variant="outline" onClick={() => setLabor(service?{...laborExample,minutes:'30',yield:'1'}:laborExample)}>Usar exemplo de mão de obra</Button></div>
         <div className={styles.fields}>
           <StudyField label="Remuneração mensal pelo trabalho (R$)" value={labor.income} example="2400" min={0.01} max={1e9} onChange={v => setLaborField('income', v)}/>
           <StudyField label="Dias de produção por mês" value={labor.days} example="20" min={1} max={31} step="1" onChange={v => setLaborField('days', v)}/>
           <StudyField label="Horas produtivas por dia" value={labor.hours} example="6" min={0.01} max={24} onChange={v => setLaborField('hours', v)}/>
-          <StudyField label="Tempo de trabalho por lote (minutos)" value={labor.minutes} example="90" step="1" onChange={v => setLaborField('minutes', v)}/>
-          <StudyField label="Unidades produzidas por lote" value={labor.yield} example="12" min={1} step="1" onChange={v => setLaborField('yield', v)}/>
+          <StudyField label={service?'Tempo por ficha de atendimento (minutos)':'Tempo de trabalho por lote (minutos)'} value={labor.minutes} example={service?'30':'90'} step="1" onChange={v => setLaborField('minutes', v)}/>
+          <StudyField label={service?'Atendimentos por ficha':'Unidades produzidas por lote'} value={labor.yield} example={service?'1':'12'} min={1} step="1" onChange={v => setLaborField('yield', v)}/>
         </div>
         <div className={styles.results} aria-live="polite" aria-atomic="true">
           <Metric label="Valor da sua hora" value={laborResult ? money(laborResult.hourly) : '—'} detail={laborResult ? `${decimalText(laborResult.monthlyHours)} horas produtivas no mês` : 'Informe sua remuneração e disponibilidade'}/>
-          <Metric label="Mão de obra por lote" value={laborResult ? money(laborResult.batch) : '—'} detail="Valor da hora × minutos de trabalho ÷ 60"/>
-          <Metric label="Mão de obra por unidade" value={laborResult ? money(laborResult.unit) : '—'} detail="Custo de mão de obra do lote ÷ rendimento" highlight/>
+          <Metric label={service?'Mão de obra por ficha':'Mão de obra por lote'} value={laborResult ? money(laborResult.batch) : '—'} detail="Valor da hora × minutos de trabalho ÷ 60"/>
+          <Metric label={service?'Mão de obra por atendimento':'Mão de obra por unidade'} value={laborResult ? money(laborResult.unit) : '—'} detail="Custo de mão de obra do lote ÷ rendimento" highlight/>
         </div>
         {!laborResult && <p className="subtle mt-3">Preencha todos os campos com valores válidos. Remuneração, dias, horas e rendimento precisam ser maiores que zero. Dias (até 31), minutos e unidades são inteiros; horas por dia vão até 24.</p>}
       </div>
 
       <details className={styles.details}><summary>Que tempo devo contar? E se outra pessoa trabalhar comigo?</summary><div>
-        <p>Conte preparo, montagem, embalagem e limpeza associados ao lote. O tempo do forno sem sua atenção não é automaticamente tempo de mão de obra: se você prepara outro lote nesse intervalo, evite cobrar os mesmos minutos duas vezes.</p>
-        <p>Com mais de uma pessoa, calcule o custo de cada uma (valor da hora × tempo trabalhado) e some. Para funcionários, considere remuneração e os custos aplicáveis à contratação. Em Receitas, use um valor por hora equivalente que, multiplicado pelo tempo informado, represente esse total.</p>
+        <p>{service?'Conte preparação do posto, atendimento, higienização e organização dos materiais. Se um equipamento trabalha sem sua atenção enquanto você atende outra pessoa, evite cobrar os mesmos minutos de trabalho humano duas vezes.':'Conte preparo, montagem, embalagem e limpeza associados ao lote. O tempo do forno sem sua atenção não é automaticamente tempo de mão de obra: se você prepara outro lote nesse intervalo, evite cobrar os mesmos minutos duas vezes.'}</p>
+        <p>Com mais de uma pessoa, calcule o custo de cada uma (valor da hora × tempo trabalhado) e some. Para funcionários, considere remuneração e os custos aplicáveis à contratação. Em {business.offers}, use um valor por hora equivalente que, multiplicado pelo tempo informado, represente esse total.</p>
       </div></details>
       <p className={styles.note}><strong>Seu pagamento pelo trabalho é um custo. O lucro é do negócio.</strong> A mesma retirada não deve entrar na mão de obra e novamente nas despesas operacionais. O lucro pode formar uma reserva, financiar melhorias e remunerar o investimento.</p>
       <p className="subtle">Para aprofundar: <a className={styles.source} href="https://sebrae.com.br/Sebrae/Portal%20Sebrae/UFs/MG/Imagens/Conserto%20de%20Roupas.pdf" target="_blank" rel="noreferrer">Sebrae — mão de obra e remuneração (PDF)</a>.</p>
@@ -79,7 +82,7 @@ export function PricingGuide({ onRecipes }: { onRecipes: () => void }) {
     <section id="guide-sales" className={`panel ${styles.lesson}`} aria-labelledby="guide-sales-title">
       <h2 id="guide-sales-title" className={styles.title}><span className="number-dot">2</span>Mais lucro por unidade significa mais lucro no mês?</h2>
       <p>Nem sempre. Um preço acima do valor que o cliente percebe pode dificultar a venda e reduzir o volume. Qualidade, apresentação, conveniência e diferenciação também influenciam a decisão: aumentar o preço não significa necessariamente perder clientes.</p>
-      <div className={styles.note}><h3>Entenda o percentual antes de escolher</h3><p>Em Receitas, “Lucro desejado sobre custo (%)” é um acréscimo sobre o custo, chamado markup. Um produto que custa R$ 5,00 com acréscimo de 100% é vendido a R$ 10,00. Sobram R$ 5,00: isso representa 50% do preço de venda, a margem sobre faturamento.</p><p className="mt-2">Preço = custo × (1 + acréscimo ÷ 100). Margem = (preço − custo) ÷ preço × 100.</p></div>
+      <div className={styles.note}><h3>Entenda o percentual antes de escolher</h3><p>Em {business.offers}, “Lucro desejado sobre custo (%)” é um acréscimo sobre o custo, chamado markup. Um produto que custa R$ 5,00 com acréscimo de 100% é vendido a R$ 10,00. Sobram R$ 5,00: isso representa 50% do preço de venda, a margem sobre faturamento.</p><p className="mt-2">Preço = custo × (1 + acréscimo ÷ 100). Margem = (preço − custo) ÷ preço × 100.</p></div>
       <div className={styles.exercise}>
         <div className={styles.exerciseHeader}><h3>Compare preço e volume de vendas</h3><Button variant="outline" onClick={() => setSales(salesExample)}>Usar exemplo de vendas</Button></div>
         <p>Informe duas hipóteses para o mesmo período. A quantidade vendida é definida por você; o guia não prevê a demanda.</p>
@@ -109,17 +112,18 @@ export function PricingGuide({ onRecipes }: { onRecipes: () => void }) {
     </section>
 
     <section id="guide-apply" className={`panel ${styles.lesson}`} aria-labelledby="guide-apply-title">
-      <h2 id="guide-apply-title" className={styles.title}><span className="number-dot">3</span>Leve os estudos para Receitas</h2>
-      <p>Depois de revisar suas hipóteses, abra a receita e preencha os campos correspondentes:</p>
+      <h2 id="guide-apply-title" className={styles.title}><span className="number-dot">3</span>Leve os estudos para {business.offers}</h2>
+      <p>Depois de revisar suas hipóteses, abra sua ficha e preencha os campos correspondentes:</p>
       <ul className={styles.checklist}>
         <li><Check size={18}/><span><strong>Valor da hora de trabalho:</strong> use sua referência de remuneração por hora.</span></li>
-        <li><Check size={18}/><span><strong>Tempo de produção e Rendimento:</strong> informe o trabalho dedicado ao lote e quantas unidades ele produz.</span></li>
-        <li><Check size={18}/><span><strong>Despesas operacionais:</strong> estime os gastos não incluídos em outros custos. O percentual do app incide sobre ingredientes + embalagens. Confira se o valor em reais cobre sua parcela de energia, gás, água e outros gastos, sem repeti-los.</span></li>
+        <li><Check size={18}/><span><strong>Tempo de {service?'atendimento':'produção'} e Rendimento:</strong> informe o trabalho dedicado à ficha e a quantidade de {service?'atendimentos':'unidades'} correspondente.</span></li>
+        <li><Check size={18}/><span><strong>Despesas operacionais:</strong> estime os gastos não incluídos em outros custos. O percentual do app incide sobre {service?'produtos + descartáveis':'ingredientes + embalagens'}. Confira se o valor em reais cobre sua parcela de energia, gás, água e outros gastos, sem repeti-los.</span></li>
+        <li><Check size={18}/><span><strong>Energia e equipamentos:</strong> detalhe os recursos usados na ficha. Energia pode ser calculada em kWh; desgaste e manutenção podem ser rateados por hora de uso. Não repita esses gastos nas despesas operacionais.</span></li>
         <li><Check size={18}/><span><strong>Lucro desejado sobre custo:</strong> defina o acréscimo e confira a margem calculada no resumo.</span></li>
         <li><Check size={18}/><span><strong>Preço praticado:</strong> compare o preço que você cobra com o sugerido e acompanhe o resultado real das vendas.</span></li>
       </ul>
-      <Button onClick={onRecipes}>Abrir Receitas<ArrowRight size={17}/></Button>
-      <p className="subtle mt-3">Os valores não são transferidos automaticamente. Revise cada receita antes de salvar.</p>
+      <Button onClick={onRecipes}>Abrir {business.offers}<ArrowRight size={17}/></Button>
+      <p className="subtle mt-3">Os valores não são transferidos automaticamente. Revise cada ficha antes de salvar.</p>
     </section>
   </div>;
 }

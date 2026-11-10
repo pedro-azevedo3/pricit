@@ -15,7 +15,7 @@ docker compose up --build -d
 
 - Landing page: http://localhost:3000
 - Login: http://localhost:3000/login
-- Cadastro (tela): http://localhost:3000/cadastro
+- Cadastro com questionário: http://localhost:3000/cadastro
 - Sistema: http://localhost:3000/app
 - Documentação interativa da API: http://localhost:8000/docs
 - Saúde do backend e banco: http://localhost:8000/health
@@ -38,6 +38,24 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 4. Salve e reabra a receita. Exporte o PDF da versão salva ou abra **Precificar vendas**.
 5. Compare custo proporcional com lotes completos. Salve a simulação para exportar o PDF e consultar seus valores históricos.
 6. Em **Guia**, estude o valor da sua hora e a mão de obra por lote/unidade. Compare hipóteses de preço e volume vendido, entenda a diferença entre markup e margem e consulte as orientações para preencher **Receitas**. Os campos começam vazios; os exemplos são opcionais. Os estudos não são salvos no banco nem transferidos automaticamente, permanecem ao alternar abas e são descartados ao recarregar ou sair do app.
+
+## Segmentos e perfil do negócio
+
+A aba **Perfil** permite escolher **Culinária e confeitaria**, **Lojas de açaí e sorveterias**, **Barbearias e cabeleireiros**, **Hamburguerias** ou **Padarias**. O perfil é persistido na conta e carregado em qualquer dispositivo, sem usar preferências locais de outra pessoa. O nome do negócio é criptografado no banco.
+
+| Segmento | Biblioteca e fichas | Exemplos de custos |
+|---|---|---|
+| Culinária/confeitaria | Ingredientes / Receitas | Ingredientes, embalagens, forno e mão de obra |
+| Açaí/sorveteria | Ingredientes / Produtos | Bases, complementos, porções, copos e freezer |
+| Barbearia/cabeleireiro | Produtos / Serviços | Consumo de produtos, atendimento, energia e uso de máquinas |
+| Hamburgueria | Ingredientes / Lanches | Carne, pão, chapa, gás e embalagens |
+| Padaria | Ingredientes / Receitas | Rendimento da fornada, insumos, forno e equipamentos |
+
+Todas as fichas podem detalhar **energia, equipamentos e outros custos**. Cada recurso informa nome, categoria, medida (kWh, hora de uso ou unidade/rateio), quantidade usada na ficha inteira e valor por medida. O total é `quantidade × valor por medida`, somado aos demais custos uma única vez, fora do percentual de despesas operacionais. Evite duplicar o mesmo gasto no percentual e no detalhamento. A taxa percentual mantém a base histórica: insumos + embalagens/descartáveis.
+
+Serviços podem ser salvos sem produtos consumidos; para um atendimento, use rendimento 1 e o tempo dedicado a ele. Alimentação continua exigindo pelo menos um ingrediente. O preço, a simulação e o PDF incluem os novos custos; históricos preservam o detalhamento e os valores do momento do salvamento. Ao mudar de segmento, as fichas antigas mantêm seu formato (`recipe` ou `service`) e os dados ficam disponíveis, sem conversão automática ou exclusão.
+
+A migração `d51b7c6a203e` atribui `food` às contas existentes e `recipe` às fichas existentes, com custo adicional zero. **No Railway, publique primeiro o backend e depois o frontend**; o comando de inicialização do backend já executa `alembic upgrade head`. Não crie novas tabelas/colunas manualmente nem gere novas chaves. Consulte [o roteiro de atualização](docs/RAILWAY.md).
 
 ## Stack e organização
 
@@ -169,9 +187,9 @@ A interface usa bordô, branco e marrom. O botão de sol/lua no cabeçalho alter
 
 ## Telas de acesso
 
-A rota `/login` permite entrar com e-mail e senha. O botão Google permanece indisponível e não cria sessões. O cadastro de usuários é feito pelo administrador diretamente no banco, sem cadastro público.
+A rota `/login` permite entrar com e-mail e senha. O botão Google permanece indisponível e não cria sessões. O cadastro público em `/cadastro` começa com um questionário obrigatório (nome, segmento e objetivo), seguido de e-mail e senha de 12 a 256 caracteres com confirmação. Conta e perfil são criados atomicamente; o primeiro acesso já abre a perspectiva escolhida. A senha é armazenada como hash scrypt. Também continua disponível a criação administrativa pelo terminal.
 
-Depois de atualizar os serviços com `docker compose up --build -d`, crie uma conta:
+Depois de atualizar os serviços com `docker compose up --build -d`, crie uma conta pelo site ou, para criação administrativa, execute:
 
 ```sh
 docker compose exec backend python -m app.create_user voce@exemplo.com
@@ -181,16 +199,16 @@ O comando solicita a senha e a confirmação sem exibir o que você digita. Use 
 
 Entre em http://localhost:3000/login. A rota `/app` valida a sessão no servidor a cada solicitação, antes de renderizar o painel; sessões ausentes, inválidas, expiradas ou revogadas redirecionam para `/login`. A API também exige sessão válida em todas as rotas de negócio. A sessão dura sete dias, usa cookie HttpOnly/SameSite e é revogada ao clicar em **Sair**. Após cinco tentativas incorretas, a conta fica bloqueada por 15 minutos. Definir `users.is_active = false` bloqueia a conta e suas sessões imediatamente.
 
-O login possui controle de entrada antes de ler o corpo, consultar o banco ou calcular o hash: até **10 requisições por origem em uma janela móvel de 60 segundos**, **60 no total por minuto** e **2 requisições simultâneas**, por processo do backend. Tentativas com e-mails inexistentes, senhas válidas e corpos inválidos também entram na cota. O excesso recebe HTTP 429 com `Retry-After` e não fica em fila. Contas já bloqueadas são rejeitadas antes de calcular a senha.
+Login e cadastro público compartilham controle de entrada antes de ler o corpo, consultar o banco ou calcular o hash: até **10 requisições por origem em uma janela móvel de 60 segundos**, **60 no total por minuto** e **2 requisições simultâneas**, por processo do backend. Tentativas com e-mails inexistentes, senhas válidas e corpos inválidos também entram na cota. O excesso recebe HTTP 429 com `Retry-After` e não fica em fila. Contas já bloqueadas são rejeitadas antes de calcular a senha.
 
 A origem é o endereço de conexão recebido pelo servidor; cabeçalhos arbitrários `X-Forwarded-For` e `X-Real-IP` não alteram a cota. Atrás de proxies, usuários podem compartilhar a mesma origem e, portanto, a mesma cota de 10/minuto. Os contadores têm memória limitada e expiram após a janela; reiniciar o processo os zera. Para limites compartilhados entre múltiplos workers ou réplicas, use um armazenamento central (como Redis) ou um limitador na borda. O bloqueio de conta de 15 minutos continua persistido no PostgreSQL.
 
 
-Cada conta acessa exclusivamente seus ingredientes, receitas, históricos e PDFs. O proprietário é definido pela sessão, nunca por campos enviados pelo navegador. Não existe usuário ou senha padrão. Registros anteriores à migração de isolamento, sem proprietário conhecido, ficam preservados e ocultos até revisão administrativa.
+Cada conta acessa exclusivamente seu perfil, insumos, fichas, históricos e PDFs. O proprietário é definido pela sessão, nunca por campos enviados pelo navegador. Não existe usuário ou senha padrão. Registros anteriores à migração de isolamento, sem proprietário conhecido, ficam preservados e ocultos até revisão administrativa.
 
 Para implantação com HTTPS, configure `AUTH_COOKIE_SECURE=true` e inclua a origem exata do frontend em `CORS_ORIGINS` (lista separada por vírgulas). Em desenvolvimento, localhost e 127.0.0.1 na porta 3000 são permitidos por padrão. A tabela `users` mantém o e-mail em texto para identificação, mas nunca a senha; a tabela `user_sessions` mantém somente o hash dos tokens.
 
-Os testes de domínio do backend usam uma dependência autenticada de teste; `test_auth.py` exercita a autenticação real. Para os testes E2E de receitas e ingredientes, forneça `E2E_STORAGE_STATE` com o caminho de um estado Playwright autenticado de uma conta no banco de testes.
+Os testes de domínio do backend usam uma dependência autenticada de teste; `test_auth.py` exercita a autenticação real. O teste E2E de cadastro real usa `E2E_SIGNUP_PREFIX` (um prefixo único de execução) e cria os e-mails `<prefixo>-desktop@example.test` e `<prefixo>-mobile@example.test`; remova essas contas e seus registros no banco de testes ao terminar. Para os testes E2E autenticados, forneça `E2E_STORAGE_STATE` com o caminho de um estado Playwright autenticado de uma conta no banco de testes.
 
 ## Privacidade e integração Google
 

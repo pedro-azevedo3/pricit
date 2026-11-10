@@ -1,6 +1,6 @@
 # Login com Google no pricit
 
-As telas `/login` e `/cadastro` estão prontas. **OAuth ainda não está implementado. O isolamento por conta já está ativo.** O acesso por e-mail e senha já possui sessões revogáveis e proteção da API; as contas são criadas pelo administrador e possuem dados isolados (consulte o README). Configurar o Google Cloud, sozinho, não ativa os botões atuais. As duas telas deverão usar o mesmo fluxo: um novo `sub` do Google cria uma conta; um `sub` existente abre a conta correspondente.
+As telas `/login` e `/cadastro` estão prontas. **OAuth ainda não está implementado. O isolamento por conta já está ativo.** O acesso por e-mail e senha já possui sessões revogáveis e proteção da API; as contas podem ser criadas pelo questionário de cadastro ou pelo administrador e possuem dados isolados (consulte o README). Configurar o Google Cloud, sozinho, não ativa os botões atuais. As duas telas deverão usar o mesmo fluxo: um novo `sub` do Google cria uma conta; um `sub` existente abre a conta correspondente.
 
 ## 1. Configurar o Google
 

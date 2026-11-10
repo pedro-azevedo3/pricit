@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from .database import get_db
 from .measurements import base_unit
 from .models import Ingredient, Recipe, RecipeIngredient, RevenueSimulation, User
-from .schemas import IngredientIn, IngredientOut, RecipeIn, RecipeOut, SimulationIn, SimulationOut, SimulationResult
+from .schemas import IngredientIn, IngredientOut, RecipeIn, RecipeOut, SimulationIn, SimulationOut, SimulationResult, BusinessProfile, BusinessProfileOut
 from .services import get_or_404, ingredient_output, recipe_output, write_recipe
 from .pricing import calculate_simulation
 from .pdf import make_pdf
@@ -26,6 +26,20 @@ protected = APIRouter(dependencies=[Depends(current_user)])
 P = '/api/v1'
 DB = Depends(get_db)
 USER = Depends(current_user)
+
+def profile_output(user):
+    return BusinessProfileOut(business_name=user.business_name or '', business_type=user.business_type, pricing_goal=user.pricing_goal)
+
+@protected.get(P+'/profile', response_model=BusinessProfileOut)
+def read_profile(user: User = USER):
+    return profile_output(user)
+
+@protected.put(P+'/profile', response_model=BusinessProfileOut)
+def update_profile(data: BusinessProfile, db: Session = DB, user: User = USER):
+    for key, value in data.model_dump().items():
+        setattr(user, key, value)
+    db.commit()
+    return profile_output(user)
 
 @app.get('/health')
 def health(db: Session = DB):
@@ -113,6 +127,7 @@ def duplicate_recipe(id: UUID, db: Session = DB, user: User = USER):
     obj = get_or_404(db,Recipe,id,user.id)
     data = {key: getattr(obj,key) for key in RecipeIn.model_fields if key != 'ingredients'}
     data['name'] = obj.name[:192] + ' (cópia)'
+    data['additional_costs'] = obj.additional_costs or []
     data['ingredients'] = [dict(ingredient_id=i.ingredient_id,quantity_used=i.quantity_used,measurement_unit=i.measurement_unit) for i in obj.ingredients]
     return recipe_output(write_recipe(db,RecipeIn(**data),user.id))
 

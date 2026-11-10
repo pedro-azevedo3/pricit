@@ -8,12 +8,14 @@ import { money, perBaseUnit } from '@/lib/calculations';
 import { DecimalInput } from './ui/decimal-input';
 import { Button } from './ui/button';
 import { ErrorBox, Modal } from './shared';
+import { useBusiness } from './business-context';
 
 export function RecipeIngredientEditor({ ingredient, onClose, onSaved }: {
   ingredient: Ingredient;
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
+  const { business }=useBusiness();
   const [form, setForm] = useState({
     name: ingredient.name,
     measurement_unit: ingredient.measurement_unit,
@@ -39,11 +41,11 @@ export function RecipeIngredientEditor({ ingredient, onClose, onSaved }: {
     }
   }
 
-  return <Modal open onClose={() => !busy && onClose()} title="Editar ingrediente"
-    description="As alterações serão salvas na biblioteca e atualizarão todas as receitas que usam este ingrediente. O histórico de precificações será preservado.">
+  return <Modal open onClose={() => !busy && onClose()} title={`Editar ${business.resource}`}
+    description="As alterações serão salvas na biblioteca e atualizarão todas as fichas que usam este item. O histórico de precificações será preservado.">
     <form onSubmit={save}>
       <div className="space-y-4">
-        <label>Nome do ingrediente
+        <label>Nome do {business.resource}
           <input required maxLength={200} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </label>
         <div className="field-grid">
@@ -64,7 +66,7 @@ export function RecipeIngredientEditor({ ingredient, onClose, onSaved }: {
       <ErrorBox message={error} />
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="outline" disabled={busy} onClick={onClose}>Cancelar</Button>
-        <Button type="submit" disabled={busy}>{busy ? 'Salvando…' : 'Salvar ingrediente'}</Button>
+        <Button type="submit" disabled={busy}>{busy ? 'Salvando…' : `Salvar ${business.resource}`}</Button>
       </div>
     </form>
   </Modal>;

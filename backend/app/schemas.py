@@ -14,6 +14,26 @@ Count = Annotated[int, Field(ge=0, le=1000000, strict=True)]
 class Input(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')
 
+BusinessType = Literal['food', 'acai', 'beauty', 'burger', 'bakery']
+PricingGoal = Literal['understand_costs', 'set_prices', 'improve_profit']
+
+class BusinessProfile(Input):
+    business_name: str = Field(min_length=1, max_length=200)
+    business_type: BusinessType
+    pricing_goal: PricingGoal
+
+class BusinessProfileOut(BaseModel):
+    business_name: str
+    business_type: BusinessType
+    pricing_goal: PricingGoal
+
+class AdditionalCost(Input):
+    name: str = Field(min_length=1, max_length=200)
+    category: Literal['energy', 'equipment', 'other']
+    unit: Literal['kwh', 'hour', 'unit']
+    quantity: Quantity
+    unit_cost: Money
+
 class IngredientIn(Input):
     name: str = Field(min_length=1, max_length=200)
     measurement_unit: MeasurementUnit
@@ -36,6 +56,8 @@ class RecipeItemIn(Input):
     measurement_unit: MeasurementUnit
 
 class RecipeIn(Input):
+    kind: Literal['recipe', 'service'] = 'recipe'
+    additional_costs: list[AdditionalCost] = Field(default_factory=list, max_length=100)
     name: str = Field(min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=10000)
     yield_quantity: PositiveInt
@@ -46,10 +68,12 @@ class RecipeIn(Input):
     hourly_labor_cost: Money = Decimal(0)
     desired_markup_percentage: Percentage = Decimal(0)
     selling_price: Money | None = None
-    ingredients: list[RecipeItemIn] = Field(min_length=1, max_length=1000)
+    ingredients: list[RecipeItemIn] = Field(max_length=1000)
 
     @model_validator(mode='after')
     def unique_ingredients(self):
+        if self.kind == 'recipe' and not self.ingredients:
+            raise ValueError('Adicione pelo menos um ingrediente à receita.')
         ids = [i.ingredient_id for i in self.ingredients]
         if len(ids) != len(set(ids)):
             raise ValueError('Não repita ingredientes; altere a quantidade existente.')
@@ -65,6 +89,7 @@ class RecipeItemOut(RecipeItemIn):
     cost: Decimal
 
 class Pricing(BaseModel):
+    additional_cost: Decimal = Decimal(0)
     ingredients_cost: Decimal
     packaging_cost: Decimal
     operational_cost: Decimal

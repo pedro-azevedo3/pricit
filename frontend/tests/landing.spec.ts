@@ -6,7 +6,7 @@ test('landing apresenta o produto, calcula o preço e abre o cadastro', async ({
   await page.goto('/');
   await expect(page.locator('[data-public-page]')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(page.getByRole('button', {name: /Ativar tema/})).toHaveCount(0);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Sua receita é boa.');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Seu trabalho vale.');
   await page.locator('img[alt^="Mascote do pricit,"]').evaluate((img: HTMLImageElement) => img.decode());
   await expect(page.getByTestId('demo-price')).toHaveText('R$ 7,20');
   await page.getByLabel('Custo por unidade').fill('10');

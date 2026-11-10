@@ -1,7 +1,8 @@
 'use client';
 
 import { CircleHelp, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
-import { appTabs, type AppTab } from '@/lib/navigation';
+import { businessTabs, type AppTab } from '@/lib/navigation';
+import { useBusiness } from './business-context';
 import { AppLogo } from './app-logo';
 import { Mascot } from './mascot';
 
@@ -14,6 +15,8 @@ export function AppSidebar({ activeTab, collapsed = false, onNavigate, onToggle,
   preview?: boolean;
 }) {
   const toggleLabel = collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral';
+  const { profile } = useBusiness();
+  const appTabs = businessTabs(profile.business_type);
   return <aside data-collapsed={collapsed} aria-label="Menu lateral" className={`brand-sidebar app-sidebar ${preview ? 'absolute inset-y-0 left-0 flex' : 'fixed inset-y-0 left-0 z-20 hidden lg:flex'}`}>
     <div className={`sidebar-heading ${collapsed ? 'sidebar-heading-collapsed' : ''}`}>
       <a href="/" aria-label="pricit — início"><AppLogo/></a>

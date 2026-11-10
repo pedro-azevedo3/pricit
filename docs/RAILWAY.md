@@ -70,7 +70,7 @@ As variáveis têm precedência sobre os arquivos. Configuração ausente ou inv
 
 Salve as variáveis, publique o backend e depois o frontend. O frontend pode iniciar antes, mas chamadas à API só funcionarão com o backend disponível.
 
-Pela CLI Railway, conecte-se ao projeto e abra o container do backend:
+Crie sua conta em `https://DOMINIO/cadastro`: responda ao questionário do negócio e cadastre e-mail e senha. Para continuar usando a criação administrativa, pela CLI Railway conecte-se ao projeto e abra o container do backend:
 
 ```sh
 railway login
@@ -99,3 +99,11 @@ Referências: https://docs.railway.com/deployments/monorepo, https://docs.railwa
 ## Atualização do isolamento por conta
 
 Publique o backend com a migração `a82f30b4d9e1`. Cada nova gravação usa a conta autenticada. Os registros antigos sem autor ficam preservados e ocultos, sem atribuição automática. Confira a seção de recuperação no README antes de associar qualquer registro antigo a uma pessoa. Recarregue o frontend após o deploy para remover dados antigos já carregados na memória do navegador.
+
+## Atualização dos segmentos e cadastro público
+
+Publique primeiro o backend com a migração `d51b7c6a203e` e depois o frontend do mesmo commit. O startup padrão já roda `alembic upgrade head`; não é necessário executar SQL manual. Se o backend usar Start Command personalizado, mantenha essa etapa antes do Uvicorn. Não altere as chaves existentes.
+
+As contas atuais começam no perfil Culinária e confeitaria. Após o deploy, entre em **Perfil** para definir nome, segmento e objetivo. Receitas e históricos existentes continuam preservados; trocar de segmento não converte as fichas antigas.
+
+Valide cadastro com questionário, logout/login, persistência do perfil e a ficha de um serviço com tempo, energia e equipamento. O cadastro passa a ser público e compartilha com o login os limites por origem, total e concorrência já existentes. Não há integração de cobrança nem confirmação de e-mail nesta entrega.

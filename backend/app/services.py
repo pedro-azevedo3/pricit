@@ -35,7 +35,8 @@ def recipe_output(obj):
                           cost_per_gram=unit_cost if base_unit(ingredient.measurement_unit) == 'g' else None,
                           cost=base_quantity(item.quantity_used, item.measurement_unit)*unit_cost))
     subtotal = sum((item['cost'] for item in items), Decimal(0))
-    fields = {key: getattr(obj, key) for key in RecipeIn.model_fields if key != 'ingredients'}
+    fields = {key: getattr(obj, key) for key in RecipeIn.model_fields if key not in ('ingredients', 'additional_costs')}
+    fields['additional_costs'] = obj.additional_costs or []
     return RecipeOut(**fields, id=obj.id, created_at=obj.created_at, updated_at=obj.updated_at,
                      ingredients=items, pricing=calculate_recipe(obj, subtotal))
 
@@ -57,7 +58,10 @@ def write_recipe(db, data, owner_id, obj=None):
     if obj is None:
         obj = Recipe(owner_id=owner_id)
         db.add(obj)
-    for key, value in data.model_dump(exclude={'ingredients'}).items():
+    for key, value in data.model_dump(mode='json', exclude={'ingredients'}).items():
+        # JSON cost entries contain decimal strings; scalar encrypted fields retain native values.
+        if key != 'additional_costs':
+            value = getattr(data, key)
         setattr(obj, key, value)
     obj.ingredients.clear()
     db.flush()

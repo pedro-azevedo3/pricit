@@ -5,11 +5,13 @@ import os
 import secrets
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .database import get_db
 from .models import User, UserSession, now
+from .schemas import BusinessProfile
 
 COOKIE = 'pricit_session'
 SESSION_SECONDS = 60 * 60 * 24 * 7
@@ -50,6 +52,28 @@ class Credentials(BaseModel):
             raise ValueError('Informe um e-mail válido.')
         return value
 
+class Registration(Credentials, BusinessProfile):
+    model_config = ConfigDict(str_strip_whitespace=False, extra='forbid')
+    password: str = Field(min_length=12, max_length=256, repr=False)
+
+    @field_validator('business_name')
+    @classmethod
+    def business_name_required(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError('Informe o nome do negócio.')
+        return value
+
+def start_session(response, db, user):
+    token = secrets.token_urlsafe(32)
+    db.execute(delete(UserSession).where(UserSession.expires_at <= now()))
+    db.add(UserSession(token_hash=hashlib.sha256(token.encode()).hexdigest(), user_id=user.id,
+                       expires_at=now() + timedelta(seconds=SESSION_SECONDS)))
+    db.commit()
+    response.set_cookie(COOKIE, token, max_age=SESSION_SECONDS, httponly=True,
+                        secure=os.getenv('AUTH_COOKIE_SECURE', 'false').lower() == 'true', samesite='strict', path='/')
+    response.headers['Cache-Control'] = 'no-store'
+
 
 def check_origin(request: Request):
     # JSON requests and same-origin browser mutations protect cookie sessions from CSRF.
@@ -57,6 +81,21 @@ def check_origin(request: Request):
     allowed = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
     if request.method not in ('GET', 'HEAD', 'OPTIONS') and origin and origin not in allowed:
         raise HTTPException(403, 'Origem não permitida.')
+
+
+@router.post('/register', status_code=201, dependencies=[Depends(check_origin)])
+def register(data: Registration, response: Response, db: Session = Depends(get_db)):
+    user = User(email=data.email, password_hash=hash_password(data.password),
+                business_name=data.business_name, business_type=data.business_type, pricing_goal=data.pricing_goal)
+    db.add(user)
+    try:
+        db.flush()
+        start_session(response, db, user)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, 'Não foi possível criar a conta com esse e-mail. Se já possui conta, entre com sua senha.') from None
+    return {'email': user.email}
+
 
 
 def current_user(request: Request, db: Session = Depends(get_db)):
@@ -89,14 +128,7 @@ def login(data: Credentials, response: Response, db: Session = Depends(get_db)):
         raise HTTPException(401, 'E-mail ou senha inválidos.')
     user.failed_attempts = 0
     user.locked_until = None
-    token = secrets.token_urlsafe(32)
-    db.execute(delete(UserSession).where(UserSession.expires_at <= now()))
-    db.add(UserSession(token_hash=hashlib.sha256(token.encode()).hexdigest(), user_id=user.id,
-                       expires_at=now() + timedelta(seconds=SESSION_SECONDS)))
-    db.commit()
-    response.set_cookie(COOKIE, token, max_age=SESSION_SECONDS, httponly=True,
-                        secure=os.getenv('AUTH_COOKIE_SECURE', 'false').lower() == 'true', samesite='strict', path='/')
-    response.headers['Cache-Control'] = 'no-store'
+    start_session(response, db, user)
     return {'email': user.email}
 
 

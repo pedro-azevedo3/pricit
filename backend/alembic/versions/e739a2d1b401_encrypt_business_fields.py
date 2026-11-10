@@ -1,7 +1,7 @@
 """Encrypt existing business fields atomically, preserving IDs and relationships."""
 from alembic import op
 import sqlalchemy as sa
-from app.encryption import FIELDS, keyring, seal
+from app.encryption import LEGACY_FIELDS as FIELDS, keyring, seal
 
 revision = 'e739a2d1b401'
 down_revision = 'c28d1e9f040a'

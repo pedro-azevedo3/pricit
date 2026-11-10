@@ -3,7 +3,7 @@ import { LandingPage } from '@/components/landing-page';
 
 export const metadata: Metadata = {
   title: 'pricit · Receita boa merece preço certo',
-  description: 'Conheça seus custos, precifique receitas e planeje vendas. Com o Guia do pricit, estude o valor da sua hora, a mão de obra e o equilíbrio entre preço e lucro.',
+  description: 'Precifique produtos e serviços com o perfil do seu negócio: açaí, sorveteria, barbearia, salão, hamburgueria, padaria e confeitaria. Calcule custos e mão de obra.',
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',

@@ -28,6 +28,8 @@ class Ingredient(Owned, Identity, Base):
 
 class Recipe(Owned, Identity, Base):
     __tablename__ = 'recipes'
+    kind: Mapped[str] = mapped_column(String(16), default='recipe', server_default='recipe')
+    additional_costs = mapped_column(encrypted('recipes', 'additional_costs'), nullable=True)
     name = mapped_column(encrypted('recipes', 'name'), nullable=False)
     description = mapped_column(encrypted('recipes', 'description'), nullable=True)
     yield_quantity = mapped_column(encrypted('recipes', 'yield_quantity'), nullable=False)
@@ -65,6 +67,9 @@ class RevenueSimulation(Owned, Identity, Base):
 class User(Identity, Base):
     __tablename__ = 'users'
     email: Mapped[str] = mapped_column(String(254), unique=True)
+    business_name = mapped_column(encrypted('users', 'business_name'), nullable=True)
+    business_type: Mapped[str] = mapped_column(String(24), default='food', server_default='food')
+    pricing_goal: Mapped[str] = mapped_column(String(32), default='understand_costs', server_default='understand_costs')
     password_hash: Mapped[str] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     failed_attempts: Mapped[int] = mapped_column(Integer, default=0)

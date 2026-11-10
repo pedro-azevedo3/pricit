@@ -66,7 +66,7 @@ class LoginRateLimitMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        if scope['type'] != 'http' or scope['method'] != 'POST' or scope['path'].rstrip('/') != '/api/v1/auth/login':
+        if scope['type'] != 'http' or scope['method'] != 'POST' or scope['path'].rstrip('/') not in ('/api/v1/auth/login', '/api/v1/auth/register'):
             return await self.app(scope, receive, send)
         # Use the transport peer (or Uvicorn's explicitly trusted proxy resolution).
         # Arbitrary X-Forwarded-For / X-Real-IP headers cannot create new quotas.

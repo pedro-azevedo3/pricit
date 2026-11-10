@@ -23,6 +23,10 @@ FIELDS = {
                             'revenue_snapshot': 'decimal', 'production_cost_snapshot': 'decimal', 'profit_snapshot': 'decimal',
                             'margin_snapshot': 'decimal', 'recipe_snapshot': 'json'},
 }
+# The original encryption migration must never depend on fields added by later migrations.
+LEGACY_FIELDS = FIELDS
+FIELDS = {**LEGACY_FIELDS, 'users': {'business_name': 'name'},
+          'recipes': {**LEGACY_FIELDS['recipes'], 'additional_costs': 'json'}}
 
 @lru_cache(maxsize=1)
 def keyring():

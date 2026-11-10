@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 import uuid
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.engine import make_url
 
 
@@ -11,7 +11,7 @@ def child():
     from alembic.config import Config
     from alembic import command
     from app.database import engine
-    from app.encryption import FIELDS, unseal
+    from app.encryption import LEGACY_FIELDS as FIELDS, unseal
     from datetime import datetime, timezone
     from decimal import Decimal
     import json
@@ -45,6 +45,9 @@ def child():
             values[table] = dict(connection.execute(text(f'SELECT * FROM "{table}"')).mappings().one())
     command.upgrade(config, 'head')
     with engine.begin() as connection:
+        legacy_recipe = connection.execute(text('SELECT kind, additional_costs FROM recipes')).mappings().one()
+        assert legacy_recipe['kind'] == 'recipe' and legacy_recipe['additional_costs'] is None
+        assert {c['name'] for c in inspect(connection).get_columns('users')} >= {'business_name','business_type','pricing_goal'}
         for table, fields in FIELDS.items():
             row = connection.execute(text(f'SELECT * FROM "{table}"')).mappings().one()
             for field, kind in fields.items():

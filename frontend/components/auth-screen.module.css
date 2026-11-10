@@ -12,11 +12,16 @@
 .divider { display: flex; align-items: center; gap: 16px; margin-block: 28px; color: #8395a5; font-size: 11px; }
 .divider > span { height: 1px; background: var(--auth-border); flex: 1; }
 .emailForm { display: flex; flex-direction: column; text-align: left; }
-.emailForm label { font-size: 13px; font-weight: 500; margin-bottom: 9px; }
+.emailForm label { color: var(--auth-ink); font-size: 13px; font-weight: 500; margin-bottom: 9px; }
 .emailForm label:not(:first-child) { margin-top: 19px; }
 .emailForm input { width: 100%; height: 53px; border: 1px solid var(--auth-border); border-radius: 12px; padding: 14px; color: var(--auth-ink); background: #fff; font: inherit; font-size: 13px; transition: border-color 180ms ease, box-shadow 180ms ease; }
 .emailForm input::placeholder { color: #82969b; opacity: 1; }
 .emailForm input:focus { border-color: #83ac77; box-shadow: 0 0 0 3px #83ac7715; }
+.questionnaire select { color-scheme: light; color: var(--auth-ink); background: #fff; border-color: var(--auth-border); min-height: 53px; font-size: 13px; }
+.stepLabel { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #58834f; margin-bottom: 14px; }
+.questionnaireIntro { font-size: 12px; color: var(--auth-muted); line-height: 1.8; margin-bottom: 18px; }
+.backQuestionnaire { margin-top: 16px; min-height: 40px; color: var(--auth-ink); font-size: 12px; text-decoration: underline; cursor: pointer; }
+.backQuestionnaire:focus-visible { outline: 2px solid #58834f; outline-offset: 3px; }
 .emailButton { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 49px; margin-top: 27px; padding: 13px 18px; border-radius: 28px; border: 1px solid #addc78; color: #20422d; background: #c1ff72; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .emailButton:disabled { opacity: .6; cursor: wait; }
 .googleButton:focus-visible, .emailButton:focus-visible, .emailForm input:focus-visible, .back:focus-visible, .switchMode a:focus-visible, .logo:focus-visible { outline: 2px solid #58834f; outline-offset: 4px; }

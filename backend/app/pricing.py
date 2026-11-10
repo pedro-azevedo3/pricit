@@ -26,12 +26,13 @@ def calculate_recipe(recipe, ingredients_cost):
     packaging = recipe.packaging_unit_cost * recipe.packaging_quantity
     operational = (ingredients_cost + packaging) * recipe.operational_expense_percentage / HUNDRED
     labor = recipe.hourly_labor_cost * Decimal(recipe.production_time_minutes) / Decimal(60)
-    total = ingredients_cost + packaging + operational + labor
+    additional = sum((Decimal(str(item['unit_cost'])) * Decimal(str(item['quantity'])) for item in (getattr(recipe, 'additional_costs', None) or [])), ZERO)
+    total = ingredients_cost + packaging + operational + labor + additional
     unit = total / recipe.yield_quantity
     desired_profit = unit * recipe.desired_markup_percentage / HUNDRED
     suggested = unit + desired_profit
     effective = recipe.selling_price if recipe.selling_price is not None else suggested
-    return dict(ingredients_cost=ingredients_cost, packaging_cost=packaging, operational_cost=operational,
+    return dict(additional_cost=additional, ingredients_cost=ingredients_cost, packaging_cost=packaging, operational_cost=operational,
                 labor_cost=labor, total_cost=total, unit_cost=unit, desired_profit=desired_profit,
                 suggested_price=suggested, suggested_margin=margin(desired_profit, suggested),
                 effective_price=effective, effective_profit=effective-unit, effective_margin=margin(effective-unit, effective))

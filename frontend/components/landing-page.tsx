@@ -8,6 +8,7 @@ import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombi
 import { Mascot } from './mascot';
 import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
+import { businessProfiles } from '@/lib/business';
 
 const features = [
   { icon: Leaf, number: '01', title: 'Tudo começa no ingrediente.', text: 'Cadastre o preço e a quantidade da embalagem. O custo por grama, mililitro ou unidade fica por nossa conta.', detail: 'Sua biblioteca, sempre à mão.' },
@@ -20,7 +21,8 @@ const plans = [
   { duration: '1 ano', price: '129,90', monthly: 'R$ 10,83 por mês', note: 'Um ano de receitas com os custos na mão.' },
 ];
 const questions = [
-  ['Para quem é o pricit?', 'Para quem produz alimentos e quer entender seus custos: confeiteiros, pequenos produtores e negócios que trabalham com receitas. Você cadastra os ingredientes, monta as receitas e planeja suas vendas.'],
+  ['Para quem é o pricit?', 'Para lojas de açaí e sorveterias, barbearias e cabeleireiros, hamburguerias, padarias e negócios de culinária e confeitaria. O questionário de cadastro adapta a perspectiva ao seu segmento. Você pode trocar o perfil depois, preservando seus dados.'],
+  ['Como funciona para barbearias e salões?', 'Você cadastra produtos consumidos e monta fichas de serviços com tempo de atendimento, mão de obra, energia e uso de equipamentos. Produtos são opcionais quando o serviço depende só do trabalho e da estrutura. Os custos detalhados entram no preço sugerido, nas simulações e nos PDFs.'],
   ['O que entra no cálculo do preço?', 'Ingredientes, embalagens, despesas operacionais e mão de obra. Sobre o custo, você define um percentual de acréscimo (markup) para chegar ao preço sugerido. Também pode informar o preço que já pratica.'],
   ['Markup e margem de lucro são a mesma coisa?', 'Não. Markup é o acréscimo sobre o custo. Margem é a parcela do preço de venda que corresponde ao lucro. Por exemplo: custo de R$ 5,00 com markup de 100% resulta em preço de R$ 10,00 e margem de 50%.'],
   ['O pricit me ajuda a definir o valor da minha hora?', 'Sim. A aba Guia tem orientações e calculadoras para estudar o valor da sua hora, a mão de obra por lote e por unidade e a diferença entre markup e margem. Você também compara hipóteses de preço e volume vendido antes de definir os valores em Receitas. Os estudos não alteram seus cadastros e não preveem a demanda.'],
@@ -58,8 +60,8 @@ export function LandingPage() {
       <section className={`${styles.hero} ${styles.container}`}>
         <div data-reveal="left" className={styles.heroCopy}>
           <span className={styles.pill}><span/> MENOS ACHISMO. MAIS PRICIT.</span>
-          <h1>Sua receita é boa.<br/>Seu preço também<br/>precisa <span>ser.</span><svg viewBox="0 0 100 30" aria-hidden="true"><path d="M4 17 Q43 0 91 13 M74 3 L94 13 L78 26"/></svg></h1>
-          <p>Você coloca talento na receita.<br className={styles.desktopBreak}/> A gente coloca clareza no preço. Conheça seus custos e descubra quanto cobrar pelo que você faz.</p>
+          <h1>Seu trabalho vale.<br/>Seu preço também<br/>precisa <span>valer.</span><svg viewBox="0 0 100 30" aria-hidden="true"><path d="M4 17 Q43 0 91 13 M74 3 L94 13 L78 26"/></svg></h1>
+          <p>Você coloca talento no que faz.<br className={styles.desktopBreak}/> A gente coloca clareza no preço. Calcule os custos de produtos ou serviços com a perspectiva do seu negócio.</p>
           <div className={styles.heroActions}><Link href="/cadastro" className={styles.primary}>Bora precificar <ArrowUpRight size={20}/></Link><a href="#simulador" className={styles.textLink}>Ver na prática <ArrowRight size={17}/></a></div>
           <div className={styles.heroNote}><Check size={15}/> Ingredientes, receitas, vendas e estudos em um só lugar.</div>
         </div>
@@ -72,6 +74,11 @@ export function LandingPage() {
         </div>
       </section>
       <div className={styles.benefitStrip}><div data-reveal="soft" className={styles.container}><span><Leaf size={18}/> Do ingrediente ao preço</span><Plus size={14} aria-hidden="true"/><span><BookOpen size={18}/> Cada custo no seu lugar</span><Plus size={14} aria-hidden="true"/><span><ChartNoAxesCombined size={18}/> Decisões com mais clareza</span></div></div>
+      <section className={`${styles.section} ${styles.container}`} aria-labelledby="audience-title">
+        <div data-reveal="up" className={styles.sectionIntro}><div><span className={styles.eyebrow}>UMA PERSPECTIVA PARA CADA NEGÓCIO</span><h2 id="audience-title">Produtos ou serviços.<br/>Seu trabalho na conta.</h2></div><p>Responda ao questionário antes de criar sua conta. O sistema adapta as telas e os custos ao seu segmento; você pode mudar a perspectiva em Perfil a qualquer momento.</p></div>
+        <div className={styles.audiences}>{Object.entries(businessProfiles).map(([key,business],index)=><article key={key} data-reveal="up" data-reveal-offset={index*25}><h3>{business.label}</h3><p>{business.costs}</p><span>{business.resources} + {business.offers}</span></article>)}</div>
+        <Link href="/cadastro" className={styles.textLink}>Encontrar meu perfil <ArrowRight size={17}/></Link>
+      </section>
       <section id="como-funciona" className={`${styles.section} ${styles.container}`}>
         <div data-reveal="up" className={styles.sectionIntro}><div><span className={styles.eyebrow}>SIMPLES DO COMEÇO AO LUCRO</span><h2>O seu próximo passo.<br/>Sem complicar a receita.</h2></div><p>Da primeira compra ao planejamento das vendas, o pricit organiza os números junto com você.</p></div>
         <div className={styles.steps}>{features.map((f, index) => <article data-reveal="up" data-reveal-offset={index * 35} key={f.number}><div className={styles.stepTop}><f.icon size={26}/><span>{f.number}</span></div><h3>{f.title}</h3><p>{f.text}</p><span className={styles.stepDetail}><Check size={14}/>{f.detail}</span></article>)}</div>
