@@ -2,6 +2,9 @@ export type BusinessType = 'food' | 'acai' | 'beauty' | 'burger' | 'bakery' | 'm
 export type PricingGoal = 'understand_costs' | 'set_prices' | 'improve_profit';
 export type BusinessProfile = { business_name: string; business_type: BusinessType; pricing_goal: PricingGoal };
 export const defaultProfile: BusinessProfile = { business_name: '', business_type: 'food', pricing_goal: 'understand_costs' };
+export function isFoodBusiness(type: BusinessType) {
+  return (['food','acai','burger','bakery'] as BusinessType[]).includes(type);
+}
 export const pricingGoals = [
   { value: 'understand_costs', label: 'Entender meus custos' },
   { value: 'set_prices', label: 'Definir meus preços' },
