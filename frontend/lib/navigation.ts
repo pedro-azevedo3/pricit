@@ -1,5 +1,6 @@
-import { Leaf, BookOpen, ChartNoAxesCombined, GraduationCap, UserRound, Scissors, Package, FileSignature } from 'lucide-react';
+import { Leaf, BookOpen, ChartNoAxesCombined, GraduationCap, UserRound, Package, FileSignature } from 'lucide-react';
 import { businessProfiles, type BusinessType } from './business';
+import { businessOfferIcon } from './business-icons';
 
 export type AppTab = 'ingredients' | 'recipes' | 'simulator' | 'guide' | 'profile' | 'documents';
 export const appTabs = [
@@ -12,5 +13,5 @@ export const appTabs = [
 ];
 export function businessTabs(type: BusinessType) {
   const business = businessProfiles[type];
-  return appTabs.map(tab => tab.id === 'ingredients' ? { ...tab, name: business.resources, icon: business.service ? Package : Leaf } : tab.id === 'recipes' ? { ...tab, name: business.offers, icon: business.service ? Scissors : BookOpen } : tab);
+  return appTabs.map(tab => tab.id === 'ingredients' ? { ...tab, name: business.resources, icon: business.service ? Package : Leaf } : tab.id === 'recipes' ? { ...tab, name: business.offers, icon: businessOfferIcon(type) } : tab);
 }
