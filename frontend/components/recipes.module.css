@@ -1,0 +1,11 @@
+.infoSection { display: grid; gap: 20px; }
+.sectionTitle { display: flex; align-items: center; gap: 12px; margin: 0; }
+.sectionTitle > span { margin: 0; flex-shrink: 0; }
+.infoSection label { display: grid; gap: 8px; min-width: 0; line-height: 18px; }
+.infoSection input, .infoSection textarea { margin: 0; }
+.infoSection input { height: 44px; min-height: 44px; }
+.infoGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 20px; }
+.duration { display: grid; gap: 12px; min-width: 0; }
+.durationTitle { margin: 0; font-size: 12px; line-height: 18px; font-weight: 600; color: var(--muted); }
+.durationFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .infoGrid { grid-template-columns: minmax(0, 1fr); } }

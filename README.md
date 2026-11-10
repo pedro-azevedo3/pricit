@@ -41,7 +41,7 @@ O volume `postgres_data` preserva os dados após reiniciar os serviços ou fecha
 
 ## Segmentos e perfil do negócio
 
-A aba **Perfil** permite escolher **Culinária e confeitaria**, **Lojas de açaí e sorveterias**, **Barbearias e cabeleireiros**, **Hamburguerias** ou **Padarias**. O perfil é persistido na conta e carregado em qualquer dispositivo, sem usar preferências locais de outra pessoa. O nome do negócio é criptografado no banco.
+A aba **Perfil** permite escolher **Culinária e confeitaria**, **Lojas de açaí e sorveterias**, **Barbearias e cabeleireiros**, **Hamburguerias**, **Padarias**, **Manicure**, **Designer de sobrancelhas**, **Artesãos**, **Estética automotiva**, **Fotógrafos e designers** ou **Freelancer**. O perfil é persistido na conta e carregado em qualquer dispositivo, sem usar preferências locais de outra pessoa. O nome do negócio é criptografado no banco.
 
 | Segmento | Biblioteca e fichas | Exemplos de custos |
 |---|---|---|
@@ -50,12 +50,28 @@ A aba **Perfil** permite escolher **Culinária e confeitaria**, **Lojas de aça�
 | Barbearia/cabeleireiro | Produtos / Serviços | Consumo de produtos, atendimento, energia e uso de máquinas |
 | Hamburgueria | Ingredientes / Lanches | Carne, pão, chapa, gás e embalagens |
 | Padaria | Ingredientes / Receitas | Rendimento da fornada, insumos, forno e equipamentos |
+| Manicure | Produtos / Serviços | Esmaltes, lixas, descartáveis, esterilização e atendimento |
+| Sobrancelhas | Produtos / Serviços | Henna, linhas, higienização e atendimento |
+| Artesanato | Materiais / Produtos | Materiais por peça/kit, perdas, ferramentas e horas por peça |
+| Estética automotiva | Produtos / Serviços | Produtos, água, energia, máquinas e tempo por veículo |
+| Fotografia/design | Recursos / Serviços | Criação, edição, licenças, deslocamento e equipamentos |
+| Freelancer | Insumos / Serviços | Trabalho, revisões, estrutura e despesas por entrega |
 
 Todas as fichas podem detalhar **energia, equipamentos e outros custos**. Cada recurso informa nome, categoria, medida (kWh, hora de uso ou unidade/rateio), quantidade usada na ficha inteira e valor por medida. O total é `quantidade × valor por medida`, somado aos demais custos uma única vez, fora do percentual de despesas operacionais. Evite duplicar o mesmo gasto no percentual e no detalhamento. A taxa percentual mantém a base histórica: insumos + embalagens/descartáveis.
 
 Serviços podem ser salvos sem produtos consumidos; para um atendimento, use rendimento 1 e o tempo dedicado a ele. Alimentação continua exigindo pelo menos um ingrediente. O preço, a simulação e o PDF incluem os novos custos; históricos preservam o detalhamento e os valores do momento do salvamento. Ao mudar de segmento, as fichas antigas mantêm seu formato (`recipe` ou `service`) e os dados ficam disponíveis, sem conversão automática ou exclusão.
 
 A migração `d51b7c6a203e` atribui `food` às contas existentes e `recipe` às fichas existentes, com custo adicional zero. **No Railway, publique primeiro o backend e depois o frontend**; o comando de inicialização do backend já executa `alembic upgrade head`. Não crie novas tabelas/colunas manualmente nem gere novas chaves. Consulte [o roteiro de atualização](docs/RAILWAY.md).
+
+## Contratos e orçamentos
+
+Em **Documentos**, crie um orçamento ou contrato com título, dados do prestador/cliente, escopo, datas de início/término, pagamento e condições editáveis. Orçamentos exigem validade; contratos exigem condições. Os itens discriminam serviço/entrega, mão de obra, material, equipamento ou outro valor. Você pode copiar o preço de venda de uma ficha para o documento, editá-lo e aplicar um desconto. Os custos internos e o markup não são incluídos no PDF enviado ao cliente.
+
+Os preços dos documentos são tratados em centavos: o total de cada linha é arredondado com `ROUND_HALF_UP` para duas casas, o subtotal soma as linhas e o desconto é subtraído uma única vez. A regra especial de exibição das telas de precificação não se aplica aos documentos. Preços copiados de fichas são arredondados normalmente para centavos; depois disso não acompanham alterações futuras da ficha.
+
+É possível editar documentos, usar um orçamento como base de um novo contrato (mantendo o original), pesquisar por cliente/título e filtrar por tipo. A exportação usa a versão salva. **Compartilhar PDF** abre o compartilhamento de arquivos do dispositivo quando disponível; caso contrário, baixa o arquivo para anexar no WhatsApp/e-mail. O sistema não envia mensagens automaticamente, não publica links de acesso aos PDFs e não registra assinaturas ou aceite eletrônico. Há campos para assinatura no PDF e os modelos devem ser revisados conforme o trabalho combinado.
+
+A tabela `business_documents` armazena os dados em um payload criptografado e exige proprietário. Listagem, leitura, edição, exclusão e PDF exigem sessão e verificam a conta. `/api/v1/documents` não aceita proprietário ou totais calculados pelo cliente. A migração `e62c8d7b314f` cria a tabela sem alterar documentos ou fichas existentes. Publique backend antes do frontend.
 
 ## Stack e organização
 

@@ -1,0 +1,77 @@
+import {test,expect} from '@playwright/test';
+import {documentMoney,documentTotals,type BusinessDocument} from '../lib/documents';
+
+test('documentos preservam centavos e arredondam somente cada total de linha',()=>{
+  expect(documentMoney('5.27')).toBe('R$ 5,27');
+  expect(documentMoney('12.17')).toBe('R$ 12,17');
+  const result=documentTotals([{description:'Serviço',category:'labor',quantity:'2.5',unit_price:'5.27'}],'1.01');
+  expect(result.subtotal.toString()).toBe('13.18');expect(result.total.toString()).toBe('12.17');
+});
+
+test('orçamento, contrato, PDF, compartilhamento e preços copiados são preservados',async({page,request},testInfo)=>{
+  const title=`Documento ${testInfo.project.name}-${Date.now()}`;
+  const ids:string[]=[];let recipeId:string|undefined;
+  try{
+    const recipe=await (await request.post('/api/v1/recipes',{data:{kind:'service',name:'Serviço para '+title,yield_quantity:1,production_time_minutes:30,hourly_labor_cost:'20',desired_markup_percentage:'50',packaging_quantity:0,ingredients:[]}})).json();
+    recipeId=recipe.id;
+    await page.goto('/app');
+    const nav=page.getByRole('navigation',{name:testInfo.project.name==='mobile'?'Navegação móvel':'Navegação principal'});
+    await nav.getByRole('button',{name:'Documentos',exact:true}).click();
+    await expect(page.getByRole('heading',{name:'Contratos e orçamentos'})).toBeVisible();
+    await page.getByRole('button',{name:'Novo orçamento',exact:true}).click();
+    const dialog=page.getByRole('dialog');
+    await dialog.getByLabel('Título do documento').fill(title);
+    await dialog.getByLabel('Nome do prestador',{exact:true}).fill('Profissional de teste');
+    await dialog.getByLabel('Nome do cliente',{exact:true}).fill('Cliente do orçamento');
+    await dialog.getByLabel('Data de emissão').fill('2026-11-10');
+    await dialog.getByLabel('Início previsto').fill('2026-11-25');
+    await dialog.getByLabel('Término previsto').fill('2026-11-26');
+    await dialog.getByLabel('Validade do orçamento').fill('2026-11-20');
+    await dialog.getByLabel('Descrição do trabalho e entregas').fill('Entrega do serviço com os itens descritos.');
+    await dialog.getByLabel('Condições de pagamento').fill('Pagamento na entrega.');
+    await dialog.getByLabel('Adicionar ficha cadastrada').selectOption(recipe.id);
+    await dialog.getByRole('button',{name:'Adicionar ficha ao documento'}).click();
+    await expect(dialog.getByLabel('Preço unitário do item')).toHaveValue('15.00');
+    await dialog.getByLabel('Preço unitário do item').fill('5.27');
+    await dialog.getByLabel('Quantidade do item').fill('2.5');
+    await dialog.getByLabel('Desconto no documento').fill('1.01');
+    await expect(page.getByTestId('document-total')).toHaveText('R$ 12,17');
+    await dialog.getByRole('button',{name:'Salvar documento',exact:true}).click();
+    await expect(dialog).toHaveCount(0);
+    let documents:BusinessDocument[]=await (await request.get('/api/v1/documents')).json();
+    const quote=documents.find(d=>d.title===title)!;ids.push(quote.id);
+    expect(quote.totals.total).toBe('12.17');
+    const card=page.locator(`[data-document-id="${quote.id}"]`);
+    const pdf=await request.get(`/api/v1/documents/${quote.id}/pdf`);
+    expect(pdf.status()).toBe(200);expect((await pdf.body()).subarray(0,5).toString()).toBe('%PDF-');
+    await page.evaluate(()=>{Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>false});});
+    const downloadPromise=page.waitForEvent('download');
+    await card.getByRole('button',{name:'Compartilhar PDF',exact:true}).click();
+    const download=await downloadPromise;expect(download.suggestedFilename()).toBe(`orcamento-${quote.id.slice(0,8)}.pdf`);
+    await expect(page.getByRole('status')).toContainText('Anexe o arquivo');
+    await card.getByRole('button',{name:'Usar como contrato'}).click();
+    await expect(dialog.getByLabel('Nome do cliente',{exact:true})).toHaveValue('Cliente do orçamento');
+    await expect(dialog.getByLabel('Condições e responsabilidades')).not.toHaveValue('');
+    await dialog.getByRole('button',{name:'Salvar documento',exact:true}).click();
+    await expect(dialog).toHaveCount(0);
+    documents=await (await request.get('/api/v1/documents')).json();
+    const contract=documents.find(d=>d.title===title&&d.kind==='contract')!;ids.push(contract.id);
+    expect(contract.id).not.toBe(quote.id);expect(contract.totals.total).toBe('12.17');
+    await request.put(`/api/v1/recipes/${recipe.id}`,{data:{kind:'service',name:recipe.name,yield_quantity:1,packaging_quantity:0,ingredients:[],hourly_labor_cost:'100',production_time_minutes:60}});
+    expect((await (await request.get(`/api/v1/documents/${quote.id}`)).json()).totals.total).toBe('12.17');
+    await page.reload();await nav.getByRole('button',{name:'Documentos',exact:true}).click();
+    await page.getByLabel('Pesquisar documentos').fill(title);
+    await expect(page.locator('[data-document-id]')).toHaveCount(2);
+    await page.getByLabel('Tipo de documento').selectOption('contract');
+    await expect(page.locator('[data-document-id]')).toHaveCount(1);
+    await page.locator(`[data-document-id="${contract.id}"]`).getByRole('button',{name:'Editar documento'}).click();
+    await expect(dialog.getByTestId('document-total')).toHaveText('R$ 12,17');
+    await dialog.getByLabel('Preço unitário do item').fill('6.27');
+    await dialog.getByRole('button',{name:'Salvar documento',exact:true}).click();
+    await expect(dialog).toHaveCount(0);
+    expect((await (await request.get(`/api/v1/documents/${contract.id}`)).json()).totals.total).toBe('14.67');
+    expect((await (await request.get(`/api/v1/documents/${quote.id}`)).json()).totals.total).toBe('12.17');
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+    await page.screenshot({path:`test-results/documents-${testInfo.project.name}.png`,fullPage:true,animations:'disabled'});
+  }finally{for(const id of ids)await request.delete(`/api/v1/documents/${id}`);if(recipeId)await request.delete(`/api/v1/recipes/${recipeId}`);}
+});

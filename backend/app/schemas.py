@@ -14,7 +14,7 @@ Count = Annotated[int, Field(ge=0, le=1000000, strict=True)]
 class Input(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')
 
-BusinessType = Literal['food', 'acai', 'beauty', 'burger', 'bakery']
+BusinessType = Literal['food', 'acai', 'beauty', 'burger', 'bakery', 'manicure', 'brows', 'craft', 'automotive', 'creative', 'freelance']
 PricingGoal = Literal['understand_costs', 'set_prices', 'improve_profit']
 
 class BusinessProfile(Input):

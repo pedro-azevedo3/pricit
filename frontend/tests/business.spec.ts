@@ -22,12 +22,12 @@ test('perfil adapta segmentos e serviço funciona sem ingredientes, com históri
   try{
     await page.goto('/app');
     const nav=page.getByRole('navigation',{name:testInfo.project.name==='mobile'?'Navegação móvel':'Navegação principal'});
-    for(const type of ['acai','burger','bakery','beauty'] as const){
+    for(const type of ['acai','burger','bakery','manicure','brows','craft','automotive','creative','freelance','beauty'] as const){
       await nav.getByRole('button',{name:'Perfil',exact:true}).click();
       await page.getByLabel('Nome do negócio').fill('Negócio de teste');
       await page.getByLabel('Tipo de negócio').selectOption(type);
       await page.getByRole('button',{name:'Salvar perfil do negócio'}).click();
-      await expect(page.getByRole('status')).toContainText('Perfil atualizado');
+      await expect.poll(async()=>(await (await request.get('/api/v1/profile')).json()).business_type).toBe(type);
       const business=businessProfiles[type];
       await expect(nav.getByRole('button',{name:business.offers,exact:true})).toBeVisible();
       await nav.getByRole('button',{name:business.offers,exact:true}).click();
@@ -35,6 +35,9 @@ test('perfil adapta segmentos e serviço funciona sem ingredientes, com históri
       const dialog=page.getByRole('dialog');
       await expect(dialog.getByLabel(business.yieldLabel)).toHaveValue('');
       await expect(dialog.getByPlaceholder(`Ex.: ${business.sampleOffer}`,{exact:true})).toBeVisible();
+      const fields=await Promise.all([dialog.getByLabel(business.yieldLabel).boundingBox(),dialog.getByLabel('Horas',{exact:true}).boundingBox(),dialog.getByLabel('Minutos',{exact:true}).boundingBox()]);
+      if(testInfo.project.name==='desktop'){expect(Math.max(...fields.map(box=>box!.y))-Math.min(...fields.map(box=>box!.y))).toBeLessThan(1);}
+      expect(fields[1]!.y).toBe(fields[2]!.y);
       await dialog.getByRole('button',{name:'Cancelar',exact:true}).click();
     }
     await page.reload();

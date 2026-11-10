@@ -14,6 +14,7 @@ from .pricing import calculate_simulation
 from .pdf import make_pdf
 
 from .auth import current_user, router as auth_router
+from .documents import router as documents_router
 
 from .login_limit import LoginLimiter, LoginRateLimitMiddleware
 
@@ -22,6 +23,7 @@ app.state.login_limiter = LoginLimiter()
 app.add_middleware(LoginRateLimitMiddleware)
 app.add_middleware(CORSMiddleware, allow_origins=os.getenv('CORS_ORIGINS','http://localhost:3000,http://127.0.0.1:3000').split(','), allow_methods=['GET','POST','PUT','DELETE'], allow_headers=['Content-Type'])
 app.include_router(auth_router)
+app.include_router(documents_router)
 protected = APIRouter(dependencies=[Depends(current_user)])
 P = '/api/v1'
 DB = Depends(get_db)

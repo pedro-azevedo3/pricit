@@ -21,12 +21,13 @@ const plans = [
   { duration: '1 ano', price: '129,90', monthly: 'R$ 10,83 por mês', note: 'Um ano de receitas com os custos na mão.' },
 ];
 const questions = [
-  ['Para quem é o pricit?', 'Para lojas de açaí e sorveterias, barbearias e cabeleireiros, hamburguerias, padarias e negócios de culinária e confeitaria. O questionário de cadastro adapta a perspectiva ao seu segmento. Você pode trocar o perfil depois, preservando seus dados.'],
+  ['Para quem é o pricit?', 'Para negócios de alimentação, beleza, artesanato, estética automotiva, fotografia, design e profissionais freelancers. O questionário de cadastro adapta a perspectiva ao seu segmento. Você pode trocar o perfil depois, preservando seus dados.'],
   ['Como funciona para barbearias e salões?', 'Você cadastra produtos consumidos e monta fichas de serviços com tempo de atendimento, mão de obra, energia e uso de equipamentos. Produtos são opcionais quando o serviço depende só do trabalho e da estrutura. Os custos detalhados entram no preço sugerido, nas simulações e nos PDFs.'],
   ['O que entra no cálculo do preço?', 'Ingredientes, embalagens, despesas operacionais e mão de obra. Sobre o custo, você define um percentual de acréscimo (markup) para chegar ao preço sugerido. Também pode informar o preço que já pratica.'],
   ['Markup e margem de lucro são a mesma coisa?', 'Não. Markup é o acréscimo sobre o custo. Margem é a parcela do preço de venda que corresponde ao lucro. Por exemplo: custo de R$ 5,00 com markup de 100% resulta em preço de R$ 10,00 e margem de 50%.'],
   ['O pricit me ajuda a definir o valor da minha hora?', 'Sim. A aba Guia tem orientações e calculadoras para estudar o valor da sua hora, a mão de obra por lote e por unidade e a diferença entre markup e margem. Você também compara hipóteses de preço e volume vendido antes de definir os valores em Receitas. Os estudos não alteram seus cadastros e não preveem a demanda.'],
   ['Posso exportar minhas receitas?', 'Sim. O sistema exporta PDFs das receitas salvas e das simulações, com os custos e os resultados para consulta.'],
+  ['Posso gerar contratos e orçamentos?', 'Sim. A aba Documentos permite cadastrar os dados do cliente, o escopo, os itens, os valores, os prazos e as condições. Você pode aproveitar preços cadastrados, salvar, exportar em PDF e compartilhar o arquivo. Os modelos são editáveis e o sistema não coleta assinaturas eletrônicas.'],
   ['Funciona no celular?', 'Sim. A interface se adapta ao celular, tablet e computador.'],
 ];
 const currency = (value: Decimal) => value.toNumber().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

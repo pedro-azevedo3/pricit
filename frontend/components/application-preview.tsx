@@ -8,6 +8,7 @@ import { AppTopbar } from './app-topbar';
 import { Ingredients } from './ingredients';
 import { PricingGuide } from './pricing-guide';
 import { useBusiness } from './business-context';
+import { businessProfiles } from '@/lib/business';
 import styles from './application-preview.module.css';
 
 // Public examples only. This preview never loads a session or customer records.
@@ -37,7 +38,7 @@ export type PreviewTab = 'ingredients' | 'guide';
 
 export function ApplicationPreview({ tab = 'ingredients' }: { tab?: PreviewTab }) {
   const {profile}=useBusiness();
-  const examples=profile.business_type==='food'?demoIngredients:businessExamples[profile.business_type];
+  const examples=profile.business_type==='food'?demoIngredients:businessExamples[profile.business_type as keyof typeof businessExamples] || [demoIngredient('demo-supply',businessProfiles[profile.business_type].sampleResource,'un','10','50')];
   return <div className={styles.frame} inert aria-hidden="true" data-application-preview>
     <div className={styles.canvas}>
       <AppSidebar activeTab={tab} onNavigate={noop} onHelp={noop} preview/>

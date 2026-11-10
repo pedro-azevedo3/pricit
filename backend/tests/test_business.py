@@ -5,6 +5,13 @@ from app.database import get_db
 from app.models import User
 import pytest
 
+@pytest.mark.parametrize('kind',['manicure','brows','craft','automotive','creative','freelance'])
+def test_new_business_categories(client,kind):
+    data=dict(business_name='Novo negócio',business_type=kind,pricing_goal='set_prices')
+    response=client.put('/api/v1/profile',json=data)
+    assert response.status_code==200
+    assert client.get('/api/v1/profile').json()==data
+
 @pytest.mark.auth
 def test_questionnaire_registration_profile_and_isolation(client):
     payload = dict(email='beauty@example.test', password='senha-segura-12345', business_name='Salão Ana', business_type='beauty', pricing_goal='set_prices')

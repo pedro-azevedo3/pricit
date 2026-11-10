@@ -1,0 +1,28 @@
+.heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 28px; }
+.heading h1 { font-size: 30px; font-weight: 600; margin: 8px 0 12px; }
+.heading p, .intro { color: var(--muted); font-size: 13px; line-height: 1.8; max-width: 640px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.filters { display: grid; grid-template-columns: minmax(0,1fr) 180px; align-items: end; gap: 20px; padding: 20px; margin-bottom: 24px; }
+.filters label, .form label { display: grid; gap: 8px; min-width: 0; line-height: 18px; }
+.filters input, .filters select, .form input, .form textarea, .form select { margin: 0; }
+.form { display: grid; gap: 28px; margin-top: 24px; }
+.form section { display: grid; gap: 20px; padding-top: 24px; border-top: 1px solid var(--border); }
+.form h3 { font-size: 16px; font-weight: 600; margin: 0; }
+.grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: end; gap: 20px; }
+.item { display: grid; gap: 16px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; }
+.itemHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; }
+.itemAmounts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.summary { padding: 20px; border-radius: 12px; background: var(--surface-soft); display: grid; gap: 16px; }
+.summary > div { display: flex; justify-content: space-between; gap: 20px; }
+.total { padding-top: 16px; border-top: 1px solid var(--border); font-size: 20px; font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.card { display: grid; gap: 16px; padding: 24px; min-width: 0; }
+.card h2 { font-size: 19px; font-weight: 600; overflow-wrap: anywhere; margin: 0; }
+.card p { font-size: 13px; color: var(--muted); line-height: 1.7; overflow-wrap: anywhere; }
+.badge { justify-self: start; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; background: var(--surface-soft); border-radius: 20px; padding: 6px 10px; }
+.cardTotal { font-size: 24px; font-weight: 600; }
+.source { color: var(--muted); font-size: 11px; line-height: 1.8; }
+.source a { text-decoration: underline; text-underline-offset: 3px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 20px; }
+@media (max-width: 767px) { .grid, .cards, .filters { grid-template-columns: minmax(0,1fr); }.card { padding: 20px; } }
+@media (max-width: 360px) { .itemAmounts { grid-template-columns: minmax(0,1fr); } }
