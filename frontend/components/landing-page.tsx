@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 import { ArrowUpRight, ArrowRight, Check, Plus, Leaf, BookOpen, ChartNoAxesCombined, FileDown, MoveUpRight, GraduationCap, Clock3 } from 'lucide-react';
 import { Mascot } from './mascot';
 import { MarketingHeader } from './marketing-header';
+import { MarketingPricing } from './marketing-pricing';
 import styles from './landing-page.module.css';
 import { useScrollReveal } from './use-scroll-reveal';
 import { businessProfiles } from '@/lib/business';
@@ -15,11 +16,6 @@ const features = [
   { icon: Leaf, number: '01', title: 'Tudo começa no ingrediente.', text: 'Cadastre o preço e a quantidade da embalagem. O custo por grama, mililitro ou unidade fica por nossa conta.', detail: 'Sua biblioteca, sempre à mão.' },
   { icon: BookOpen, number: '02', title: 'Sua receita, de ponta a ponta.', text: 'Some ingredientes, embalagens, despesas e seu tempo de trabalho. Porque cada detalhe entra na conta.', detail: 'Um preço que considera o seu trabalho.' },
   { icon: ChartNoAxesCombined, number: '03', title: 'Venda com os números na mão.', text: 'Simule quantidades, compare a produção em lotes e veja a diferença entre faturamento, custo e lucro.', detail: 'Mais clareza para decidir.' },
-];
-const plans = [
-  { duration: '1 mês', price: '14,90', monthly: 'R$ 14,90 por mês', note: 'Um mês para organizar suas contas.' },
-  { duration: '6 meses', price: '79,90', monthly: 'R$ 13,32 por mês', note: 'Mais tempo para acompanhar seu negócio.' },
-  { duration: '1 ano', price: '129,90', monthly: 'R$ 10,83 por mês', note: 'Um ano de receitas com os custos na mão.' },
 ];
 const questions = [
   ['Para quem é o pricit?', 'Para negócios de alimentação, beleza, artesanato, estética automotiva, fotografia, design e profissionais freelancers. O questionário de cadastro adapta a perspectiva ao seu segmento. Você pode trocar o perfil depois, preservando seus dados.'],
@@ -119,23 +115,7 @@ export function LandingPage() {
           <p>Na plataforma, use os exemplos ou preencha seus próprios valores. O Guia ajuda a entender a conta; você decide o que aplicar em cada receita.</p>
         </div>
       </section>
-      <section id="precos" className={styles.pricing} aria-labelledby="pricing-title" aria-describedby="pricing-status">
-        <div className={styles.container}>
-          <div data-reveal="up" className={styles.sectionIntro}>
-            <div><span className={styles.eyebrow}>PREÇOS · EM BREVE</span><h2 id="pricing-title">Um plano para<br/>o seu próximo passo.</h2></div>
-            <p id="pricing-status">Nossas assinaturas chegam em breve. Conheça os valores planejados; a contratação ainda não está disponível.</p>
-          </div>
-          <div className={styles.plans}>{plans.map((plan, index) => <article key={plan.duration} data-reveal="up" data-reveal-offset={index * 35} className={`${styles.plan} ${index === 2 ? styles.annualPlan : ''}`} aria-label={`Plano de ${plan.duration}`}>
-            <div className={styles.planHeading}><h3>{plan.duration}</h3><span className={styles.comingSoon}>Em breve</span></div>
-            <p className={styles.planNote}>{plan.note}</p>
-            <p className={styles.planPrice}><span>R$</span> {plan.price}</p>
-            <p className={styles.planPeriod}>Valor total para {plan.duration}</p>
-            <p className={styles.planMonthly}>{plan.monthly}</p>{index===2&&<p className={styles.planDiscount}>27% off em relação ao plano mensal</p>}
-            <div className={styles.planAvailability}>Assinatura disponível em breve</div>
-          </article>)}</div>
-          <p className={styles.pricingNote}>Os valores por mês são equivalências aproximadas do total de cada período.</p>
-        </div>
-      </section>
+      <MarketingPricing/>
       <section id="duvidas" className={`${styles.container} ${styles.faq}`}><div data-reveal="left"><span className={styles.eyebrow}>PODE PERGUNTAR</span><h2>Sem dúvidas<br/>na receita.</h2><p>Algumas respostas antes<br/>de colocar a mão na massa.</p></div><div className={styles.questions}>{questions.map(([q,a], index)=><details data-reveal="soft" data-reveal-offset={index * 12} key={q}><summary>{q}<Plus size={19}/></summary><p>{a}</p></details>)}</div></section>
       <section className={`${styles.container} ${styles.finalSection}`}><div data-reveal="zoom" className={styles.finalCta}><div><span className={styles.eyebrow}>SEU PRÓXIMO PREÇO COMEÇA AQUI</span><h2>Capriche na receita.<br/>Acerte na conta.</h2><Link href="/cadastro" className={styles.darkButton}>Começar a precificar <ArrowUpRight size={20}/></Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} sizes="(max-width: 700px) 160px, 260px" className={styles.interactiveMascot}/></div></section>
     </main>

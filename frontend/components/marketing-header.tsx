@@ -41,7 +41,7 @@ export function MarketingHeader({ autonomous = false }: { autonomous?: boolean }
         </div>}
         <a href="#como-funciona" onClick={close}>Como funciona</a>
         <a href={autonomous ? '#na-pratica' : '#simulador'} onClick={close}>Na prática</a>
-        <a href={autonomous ? '/#precos' : '#precos'} onClick={close}>Preços</a>
+        <a href="#precos" onClick={close}>Preços</a>
         <a href="#duvidas" onClick={close}>Dúvidas</a>
         <Link href="/login" className={styles.mobileAccess} onClick={close}>Entrar <ArrowUpRight size={16}/></Link><Link href={signup} className={styles.mobileAccess} onClick={close}>Registre-se <ArrowUpRight size={16}/></Link>
 

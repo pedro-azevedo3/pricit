@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Decimal from 'decimal.js';
 import { ArrowUpRight, ArrowRight, Check, Clock3, FilePenLine, ChartNoAxesCombined, Package, Plus, BriefcaseBusiness, GraduationCap, ShoppingBasket } from 'lucide-react';
 import { MarketingHeader } from './marketing-header';
+import { MarketingPricing } from './marketing-pricing';
 import { useScrollReveal } from './use-scroll-reveal';
 import base from './landing-page.module.css';
 import styles from './autonomous-landing.module.css';
@@ -22,7 +23,7 @@ const questions = [
   ['O valor da minha hora já é meu lucro?', 'Não. Sua remuneração pelo trabalho compõe o custo do serviço. O acréscimo sobre o custo é definido separadamente. O Guia ajuda a entender a diferença entre mão de obra, markup e margem.'],
   ['Posso enviar orçamentos e contratos?', 'Sim. Na aba Documentos, preencha os dados do cliente, escopo, itens, valores, prazos e condições. Salve e exporte o PDF para compartilhar. Os modelos são editáveis; a plataforma não coleta assinaturas eletrônicas.'],
   ['O pricit define quanto meus clientes vão pagar?', 'Você define os valores e avalia os cenários. O sistema organiza custos e simulações; o preço sugerido não garante demanda ou vendas. Considere também seu mercado, seu posicionamento e o escopo combinado com o cliente.'],
-  ['Como funcionam os planos?', 'As assinaturas estão em breve. Os valores planejados são R$ 14,90 por 1 mês, R$ 79,90 por 6 meses e R$ 129,90 por 1 ano. A contratação ainda não está disponível. Consulte a seção Preços na página principal.'],
+  ['Como funcionam os planos?', 'As assinaturas estão em breve. Os valores planejados são R$ 14,90 por 1 mês, R$ 79,90 por 6 meses e R$ 129,90 por 1 ano. A contratação ainda não está disponível. Consulte a seção Preços nesta página.'],
 ];
 const money = (n: Decimal) => n.toNumber().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -93,8 +94,9 @@ export function AutonomousLanding() {
           { icon: ShoppingBasket, title: 'Materiais para a próxima entrega', text: 'Selecione os itens da biblioteca, organize uma lista de compras e leve o PDF com você.' },
         ].map(({ icon: Icon, title, text }) => <article key={title} data-reveal="up"><span><Icon size={23}/></span><div><h3>{title}</h3><p>{text}</p></div></article>)}<p className={styles.disclaimer}>Você revisa e compartilha os documentos. Assinaturas eletrônicas não são coletadas pela plataforma.</p></div>
       </section>
+      <MarketingPricing/>
       <section id="duvidas" className={`${base.container} ${base.faq}`}><div data-reveal="left"><span className={base.eyebrow}>ANTES DO PRÓXIMO PROJETO</span><h2>Seu trabalho muda.<br/>A conta acompanha.</h2><p>Respostas para quem trabalha<br/>por conta própria.</p></div><div className={base.questions}>{questions.map(([q, a]) => <details key={q}><summary>{q}<Plus size={19}/></summary><p>{a}</p></details>)}</div></section>
-      <section className={`${base.container} ${base.finalSection}`}><div className={base.finalCta} data-reveal="zoom"><div><span className={base.eyebrow}>SEU TALENTO TEM VALOR</span><h2>Faça seu próximo preço<br/>respeitar seu trabalho.</h2><Link href={signup} className={base.darkButton}>Começar com meu perfil <ArrowUpRight size={20}/></Link><Link href="/#precos" className={styles.plansLink}>Ver planos · assinaturas em breve</Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} className={base.interactiveMascot}/></div></section>
+      <section className={`${base.container} ${base.finalSection}`}><div className={base.finalCta} data-reveal="zoom"><div><span className={base.eyebrow}>SEU TALENTO TEM VALOR</span><h2>Faça seu próximo preço<br/>respeitar seu trabalho.</h2><Link href={signup} className={base.darkButton}>Começar com meu perfil <ArrowUpRight size={20}/></Link><Link href="#precos" className={styles.plansLink}>Ver planos · assinaturas em breve</Link></div><Image src="/mascot-happy.png" alt="Mascote do pricit sorrindo" width={260} height={260} className={base.interactiveMascot}/></div></section>
     </main>
     <footer className={`${base.container} ${base.footer}`}><Link href="/" className={base.footerLogo} aria-label="pricit — início"><Image src="/pricit-logo-dark-green.png" alt="pricit" width={96} height={42}/></Link><span>Seu trabalho merece preço certo.</span><a href="#conteudo">Voltar ao topo ↑</a></footer>
   </div>;
