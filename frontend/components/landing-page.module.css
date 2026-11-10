@@ -210,7 +210,7 @@
   .steps article:hover .stepTop > svg { transform: translateY(-4px) rotate(-6deg); }
 }
 @keyframes headerEnter { from { opacity: 0; translate: 0 -8px; } to { opacity: 1; translate: 0 0; } }
-@keyframes mascotFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes mascotFloat { 0%, 100% { translate: var(--mascot-offset-x, 0px) var(--mascot-offset-y, 0px); } 50% { translate: var(--mascot-offset-x, 0px) calc(var(--mascot-offset-y, 0px) - 8px); } }
 @keyframes tagEnter { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
 @keyframes sparkleTurn { from { opacity: 0; rotate: -70deg; } to { opacity: 1; rotate: 0deg; } }
 @keyframes drawArrow { from { stroke-dashoffset: 150; } to { stroke-dashoffset: 0; } }
@@ -231,6 +231,8 @@
 .organizeCopy li:nth-child(3) { transition-delay: 70ms; }
 .interactiveMascot { --mascot-angle: 0deg; transform-origin: 50% 85%; transition: transform 300ms ease; }
 .heroMascot, .finalCta > img { --mascot-angle: 8deg; }
+/* Compensate the PNG's uneven transparent margins without shifting the circle. */
+.heroArt .heroMascot { --mascot-offset-x: -3.4%; --mascot-offset-y: .7%; translate: var(--mascot-offset-x) var(--mascot-offset-y); transform-origin: center; }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .plan:hover { transform: translateY(-9px); border-color: #9bb77e; box-shadow: 0 18px 38px #173d3014; }
   .annualPlan:hover { box-shadow: 0 18px 38px #73984324; }
